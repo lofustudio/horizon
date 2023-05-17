@@ -16,6 +16,8 @@ jobs:
 
     runs-on: ${{ matrix.platform }}
     steps:
+      - uses: actions/checkout@v3
+
       - uses: ./.github/actions/deps
 
       - name: build (${{ matrix.platform }})
@@ -36,6 +38,8 @@ jobs:
   build-android:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+
       - uses: ./.github/actions/deps
         id: 'deps'
         with:
@@ -56,6 +60,8 @@ jobs:
   build-ios:
     runs-on: macos-latest
     steps:
+      - uses: actions/checkout@v3
+
       - uses: ./.github/actions/deps
         with:
           ios: '1'
