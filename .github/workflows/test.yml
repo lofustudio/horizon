@@ -71,3 +71,5 @@ jobs:
 
       - name: build (ios)
         run: yarn tauri ios build --debug
+        env:
+          TAURI_APPLE_DEVELOPMENT_TEAM: "PIPPAGAY"
