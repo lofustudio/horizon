@@ -1,5 +1,5 @@
 [package]
-name = "horizon"
+name = "horizonlib"
 version = "0.0.1"
 description = "The universal music app."
 authors = ["tygerxqt", "NyanSpaghetti"]

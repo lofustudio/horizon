@@ -4,5 +4,5 @@
 )]
 
 pub fn main() {
-    horizon::AppBuilder::new().run();
+    horizonlib::AppBuilder::new().run();
 }
