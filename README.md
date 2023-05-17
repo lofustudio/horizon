@@ -1,3 +1,3 @@
-# Horizon
+# ☀️ Horizon
 
-The universal music app. Built with Tauri and Next.
+A stupidly simple and powerful music app. Built with Tauri and Next.
