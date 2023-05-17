@@ -48,13 +48,13 @@ runs:
 
     - name: setup Java (android)
       uses: actions/setup-java@v3
-      if: INPUT_ANDROID == '1'
+      if: inputs.android == '1'
       with:
         distribution: 'temurin'
         java-version: '11'
 
     - name: setup NDK (android)
-      if: INPUT_ANDROID == '1'
+      if: inputs.android == '1'
       uses: nttld/setup-ndk@v1
       id: setup-ndk
       with:
@@ -62,13 +62,13 @@ runs:
         local-cache: true
 
     - name: initalize AStudio Project (android)
-      if: INPUT_ANDROID == '1'
+      if: inputs.android == '1'
       shell: bash
       run: pnpm tauri android init
       env:
         NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
 
     - name: initalize Xcode Project (ios)
-      if: INPUT_IOS == '1'
+      if: inputs.ios == '1'
       shell: bash
       run: pnpm tauri ios init
