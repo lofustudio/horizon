@@ -1,0 +1,76 @@
+name: 'setup deps'
+description: 'Set up dependencies required to build'
+inputs:
+  ios:
+    description: 'Prepare dependencies for iOS builds'
+    required: false
+    default: '0'
+  android:
+    description: 'Prepare dependencies for Android builds'
+    required: false
+    default: '0'
+outputs:
+  ndk-path:
+    description: "NDK_HOME"
+    value: ${{ steps.setup-ndk.outputs.ndk-path }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v3
+
+    - uses: pnpm/action-setup@v2
+      with:
+        version: latest
+
+    - name: setup node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
+        cache: pnpm
+
+    - name: install Rust stable
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Rust cache
+      uses: swatinem/rust-cache@v2
+      with:
+        workspaces: './src-tauri -> target'
+
+    - name: install dependencies (ubuntu)
+      if: matrix.platform == 'ubuntu-latest'
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libgtk-4-dev libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl3
+
+    - name: install frontend dependencies
+      shell: bash
+      run: pnpm install
+
+    - name: setup Java (android)
+      uses: actions/setup-java@v3
+      if: INPUT_ANDROID == '1'
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+
+    - name: setup NDK (android)
+      if: INPUT_ANDROID == '1'
+      uses: nttld/setup-ndk@v1
+      id: setup-ndk
+      with:
+        ndk-version: r25b
+        local-cache: true
+
+    - name: initalize AStudio Project (android)
+      if: INPUT_ANDROID == '1'
+      shell: bash
+      run: pnpm tauri android init
+      env:
+        NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+
+    - name: initalize Xcode Project (ios)
+      if: INPUT_IOS == '1'
+      shell: bash
+      run: pnpm tauri ios init
