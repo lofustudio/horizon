@@ -64,3 +64,8 @@ jobs:
 
       - name: build (ios)
         run: yarn tauri ios build
+        env:
+          TAURI_APPLE_DEVELOPMENT_TEAM: "PIPPAGAY"
+          CODE_SIGN_IDENTITY: ""
+          CODE_SIGNING_REQUIRED: "NO"
+          CODE_SIGNING_ALLOWED: "NO"

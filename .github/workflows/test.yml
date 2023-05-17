@@ -49,7 +49,7 @@ jobs:
           android: '1'
 
       - name: build (android)
-        run: yarn tauri android build --debug --split-per-abi
+        run: yarn tauri android build --debug
         env:
           NDK_HOME: ${{ steps.deps.outputs.ndk-path }}
 
@@ -73,3 +73,6 @@ jobs:
         run: yarn tauri ios build --debug
         env:
           TAURI_APPLE_DEVELOPMENT_TEAM: "PIPPAGAY"
+          CODE_SIGN_IDENTITY: ""
+          CODE_SIGNING_REQUIRED: "NO"
+          CODE_SIGNING_ALLOWED: "NO"
