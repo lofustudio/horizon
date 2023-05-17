@@ -32,6 +32,7 @@ jobs:
       - name: upload ${{ matrix.platform }}
         uses: actions/upload-artifact@v3
         with:
+          name: ${{ matrix.platform }}
           path: "${{ join(fromJSON(steps.build_os.outputs.artifactPaths), '\n') }}"
           if-no-files-found: ignore
 
@@ -53,7 +54,7 @@ jobs:
       - name: upload (android)
         uses: actions/upload-artifact@v3
         with:
-          name: apks
+          name: android
           path: |
             src-tauri/gen/android/hello/app/build/outputs/apk/**/**/*.apk
 
