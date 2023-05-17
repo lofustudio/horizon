@@ -2,7 +2,8 @@ name: 'test'
 on:
   push:
     branches:
-      - main
+      - '**'
+      - '!stable'
   pull_request:
   workflow_dispatch:
 
