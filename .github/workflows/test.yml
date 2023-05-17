@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, ubuntu-20.04, windows-latest]
+        platform: [macos-latest, ubuntu-latest, windows-latest]
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -37,31 +37,63 @@ jobs:
           workspaces: './src-tauri -> target'
 
       - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-20.04'
+        if: matrix.platform == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libgtk-4-dev libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl3
 
       - name: install frontend dependencies
         run: pnpm install
 
       - name: build (${{ matrix.platform }})
+        id: build_os
         uses: tauri-apps/tauri-action@v0
+        with:
+          includeDebug: true
+          includeRelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: build (android)
-        if: matrix.platform == 'ubuntu-20.04'
+        id: build_android
+        if: matrix.platform == 'ubuntu-latest'
         uses: tauri-apps/tauri-action@v0
         with:
+          includeDebug: true
+          includeRelease: false
           args: "-t android"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: build (ios)
+        id: build_ios
         if: matrix.platform == 'macos-latest'
         uses: tauri-apps/tauri-action@v0
         with:
+          includeDebug: true
+          includeRelease: false
           args: "-t ios"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: upload ${{ matrix.platform }} artifacts
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          path: "${{ join(fromJSON(steps.build_os.outputs.artifactPaths), '\n') }}"
+          if-no-files-found: ignore
+
+      - name: upload android artifacts
+        uses: actions/upload-artifact@v3
+        if: matrix.platform == 'ubuntu-latest'
+        with:
+          path: "${{ join(fromJSON(steps.build_android.outputs.artifactPaths), '\n') }}"
+          if-no-files-found: ignore
+
+      - name: upload ios artifacts
+        uses: actions/upload-artifact@v3
+        if: matrix.platform == 'macos-latest'
+        with:
+          name: 
+          path: "${{ join(fromJSON(steps.build_ios.outputs.artifactPaths), '\n') }}"
+          if-no-files-found: ignore
