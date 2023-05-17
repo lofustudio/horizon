@@ -1,14 +1,14 @@
-name: 'setup deps'
-description: 'Set up dependencies required to build'
+name: "setup deps"
+description: "Set up dependencies required to build"
 inputs:
   ios:
-    description: 'Prepare dependencies for iOS builds'
+    description: "Prepare dependencies for iOS builds"
     required: false
-    default: '0'
+    default: "0"
   android:
-    description: 'Prepare dependencies for Android builds'
+    description: "Prepare dependencies for Android builds"
     required: false
-    default: '0'
+    default: "0"
 outputs:
   ndk-path:
     description: "NDK_HOME"
@@ -17,15 +17,11 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: pnpm/action-setup@v2
-      with:
-        version: latest
-
     - name: setup node
       uses: actions/setup-node@v3
       with:
         node-version: 16
-        cache: pnpm
+        cache: yarn
 
     - name: install Rust stable
       uses: dtolnay/rust-toolchain@stable
@@ -33,7 +29,7 @@ runs:
     - name: Rust cache
       uses: swatinem/rust-cache@v2
       with:
-        workspaces: './src-tauri -> target'
+        workspaces: "./src-tauri -> target"
 
     - name: install dependencies (ubuntu)
       if: matrix.platform == 'ubuntu-latest'
@@ -44,14 +40,14 @@ runs:
 
     - name: install frontend dependencies
       shell: bash
-      run: pnpm install
+      run: yarn install
 
     - name: setup Java (android)
       uses: actions/setup-java@v3
       if: inputs.android == '1'
       with:
-        distribution: 'temurin'
-        java-version: '11'
+        distribution: "temurin"
+        java-version: "11"
 
     - name: setup NDK (android)
       if: inputs.android == '1'
@@ -64,11 +60,13 @@ runs:
     - name: initalize AStudio Project (android)
       if: inputs.android == '1'
       shell: bash
-      run: pnpm tauri android init
+      run: yarn tauri android init
       env:
         NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
 
     - name: initalize Xcode Project (ios)
       if: inputs.ios == '1'
       shell: bash
-      run: pnpm tauri ios init
+      run: yarn tauri ios init
+      env:
+        TAURI_APPLE_DEVELOPMENT_TEAM: "PIPPAGAY"

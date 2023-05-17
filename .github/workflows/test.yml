@@ -5,6 +5,8 @@ on:
       - '**'
       - '!stable'
   pull_request:
+    branches:
+      - 'stable'
   workflow_dispatch:
 
 jobs:
@@ -47,7 +49,7 @@ jobs:
           android: '1'
 
       - name: build (android)
-        run: pnpm tauri android build --debug --split-per-abi
+        run: yarn tauri android build --debug --split-per-abi
         env:
           NDK_HOME: ${{ steps.deps.outputs.ndk-path }}
 
@@ -56,7 +58,7 @@ jobs:
         with:
           name: android
           path: |
-            src-tauri/gen/android/hello/app/build/outputs/apk/**/**/*.apk
+            src-tauri/gen/android/horizon/app/build/outputs/apk/**/**/*.apk
 
   build-ios:
     runs-on: macos-latest
@@ -68,4 +70,4 @@ jobs:
           ios: '1'
 
       - name: build (ios)
-        run: pnpm tauri ios build --debug
+        run: yarn tauri ios build --debug

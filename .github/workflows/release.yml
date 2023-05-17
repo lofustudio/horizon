@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  release-tauri:
+  release-os:
     permissions:
       contents: write
     strategy:
@@ -30,3 +30,37 @@ jobs:
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: true
           prerelease: false
+
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ./.github/actions/deps
+        id: 'deps'
+        with:
+          android: '1'
+
+      - name: build (android)
+        run: yarn tauri android build
+        env:
+          NDK_HOME: ${{ steps.deps.outputs.ndk-path }}
+
+      - name: upload (android)
+        uses: actions/upload-artifact@v3
+        with:
+          name: android
+          path: |
+            src-tauri/gen/android/horizon/app/build/outputs/apk/**/**/*.apk
+
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ./.github/actions/deps
+        with:
+          ios: '1'
+
+      - name: build (ios)
+        run: yarn tauri ios build
