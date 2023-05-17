@@ -36,7 +36,6 @@ jobs:
         with:
           name: ${{ matrix.platform }}
           path: "${{ join(fromJSON(steps.build_os.outputs.artifactPaths), '\n') }}"
-          if-no-files-found: ignore
 
   build-android:
     runs-on: ubuntu-latest
@@ -73,6 +72,7 @@ jobs:
         run: yarn tauri ios build --debug
         env:
           TAURI_APPLE_DEVELOPMENT_TEAM: "PIPPAGAY"
+          CODE_SIGN_STYLE: "Manual"
           CODE_SIGN_IDENTITY: ""
           CODE_SIGNING_REQUIRED: "NO"
           CODE_SIGNING_ALLOWED: "NO"

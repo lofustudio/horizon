@@ -31,6 +31,15 @@ runs:
       with:
         workspaces: "./src-tauri -> target"
 
+    - name: Next cache
+      uses: actions/cache@v3
+      with:
+        path: |
+          ${{ github.workspace }}/.next/cache
+        key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+        restore-keys: |
+          ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+
     - name: install dependencies (ubuntu)
       if: matrix.platform == 'ubuntu-latest'
       shell: bash
@@ -47,7 +56,7 @@ runs:
       if: inputs.android == '1'
       with:
         distribution: "temurin"
-        java-version: "8"
+        java-version: "11"
 
     - name: setup NDK (android)
       if: inputs.android == '1'
@@ -55,7 +64,7 @@ runs:
       id: setup-ndk
       with:
         ndk-version: r25b
-        local-cache: true
+        local-cache: false
 
     - name: initalize AStudio Project (android)
       if: inputs.android == '1'
@@ -70,3 +79,7 @@ runs:
       run: yarn tauri ios init
       env:
         TAURI_APPLE_DEVELOPMENT_TEAM: "PIPPAGAY"
+        CODE_SIGN_STYLE: "Manual"
+        CODE_SIGN_IDENTITY: ""
+        CODE_SIGNING_REQUIRED: "NO"
+        CODE_SIGNING_ALLOWED: "NO"
