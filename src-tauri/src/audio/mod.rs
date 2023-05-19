@@ -1,5 +1,5 @@
 use rodio::cpal::{self, traits::HostTrait};
-use rodio::{source::Source, Decoder, OutputStream, Sink};
+use rodio::{Decoder, OutputStream, Sink};
 use std::io::Cursor;
 use tauri::api::file::read_binary;
 use tauri::command;
@@ -23,5 +23,4 @@ async fn play_file(path: String) {
     sink.sleep_until_end();
 
     println!("Finished playing file!");
-    return;
 }
