@@ -48,7 +48,6 @@ jobs:
         run: yarn tauri android build --debug
         env:
           NDK_HOME: ${{ steps.deps.outputs.ndk-path }}
-          TARGET: x86_64-linux-android
 
       - name: upload (android)
         uses: actions/upload-artifact@v3
