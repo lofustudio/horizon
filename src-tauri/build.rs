@@ -7,10 +7,7 @@ fn main() {
     tauri_build::build()
 }
 
-#[cfg(target_os = "android")]
 #[no_mangle]
 pub extern "C" fn __cxa_pure_virtual() {
-    loop {
-        std::thread::sleep(std::time::Duration::from_secs(u64::MAX))
-    }
+    loop {}
 }
