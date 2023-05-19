@@ -45,7 +45,7 @@ jobs:
           android: '1'
 
       - name: build (android)
-        run: yarn tauri android build --debug
+        run: yarn tauri android build --debug -t x86_64-linux-android
         env:
           NDK_HOME: ${{ steps.deps.outputs.ndk-path }}
 
