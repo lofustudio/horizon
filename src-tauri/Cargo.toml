@@ -8,7 +8,8 @@ repository = "https://github.com/lofustudio/horizon"
 edition = "2021"
 
 [build-dependencies]
-tauri-build = { version = "2.0.0-alpha.5", features = [] }
+tauri-build = { version = "=2.0.0-alpha.4", features = [] }
+tauri-utils = "=2.0.0-alpha.4"
 
 [dependencies]
 tauri = { version = "2.0.0-alpha.0", features = ["shell-open", "window-close", "window-hide", "window-maximize", "window-minimize", "window-show", "window-start-dragging", "window-unmaximize", "window-unminimize"] }
