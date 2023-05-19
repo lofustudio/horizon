@@ -2,7 +2,7 @@ name: 'test'
 on:
   push:
     branches:
-      - 'stable'
+      - stable
   pull_request:
   workflow_dispatch:
 
@@ -32,7 +32,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.platform }}
-          path: "${{ join(fromJSON(steps.build_os.outputs.artifactPaths), '\n') }}"
+          path: ${{ join(fromJSON(steps.build_os.outputs.artifactPaths), '\n') }}
 
   build-android:
     runs-on: ubuntu-latest
@@ -40,14 +40,15 @@ jobs:
       - uses: actions/checkout@v3
 
       - uses: ./.github/actions/deps
-        id: 'deps'
+        id: deps
         with:
           android: '1'
 
       - name: build (android)
-        run: yarn tauri android build --debug -t x86_64-linux-android
+        run: yarn tauri android build --debug
         env:
           NDK_HOME: ${{ steps.deps.outputs.ndk-path }}
+          TARGET: x86_64-linux-android
 
       - name: upload (android)
         uses: actions/upload-artifact@v3

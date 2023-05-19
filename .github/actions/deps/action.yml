@@ -1,17 +1,17 @@
-name: "setup deps"
-description: "Set up dependencies required to build"
+name: 'setup deps'
+description: 'Set up dependencies required to build'
 inputs:
   ios:
-    description: "Prepare dependencies for iOS builds"
+    description: 'Prepare dependencies for iOS builds'
     required: false
-    default: "0"
+    default: '0'
   android:
-    description: "Prepare dependencies for Android builds"
+    description: 'Prepare dependencies for Android builds'
     required: false
-    default: "0"
+    default: '0'
 outputs:
   ndk-path:
-    description: "NDK_HOME"
+    description: 'NDK_HOME'
     value: ${{ steps.setup-ndk.outputs.ndk-path }}
 
 runs:
@@ -29,7 +29,7 @@ runs:
     - name: Rust cache
       uses: swatinem/rust-cache@v2
       with:
-        workspaces: "./src-tauri -> target"
+        workspaces: './src-tauri -> target'
 
     - name: Next cache
       uses: actions/cache@v3
@@ -55,8 +55,8 @@ runs:
       uses: actions/setup-java@v3
       if: inputs.android == '1'
       with:
-        distribution: "temurin"
-        java-version: "11"
+        distribution: 'temurin'
+        java-version: '11'
 
     - name: setup NDK (android)
       if: inputs.android == '1'
@@ -78,8 +78,8 @@ runs:
       shell: bash
       run: yarn tauri ios init
       env:
-        TAURI_APPLE_DEVELOPMENT_TEAM: "PIPPAGAY"
-        HOMEBREW_NO_INSTALL_CLEANUP: "TRUE"
+        TAURI_APPLE_DEVELOPMENT_TEAM: 'PIPPAGAY'
+        HOMEBREW_NO_INSTALL_CLEANUP: 'TRUE'
 
     - name: install Apple certificates (ios)
       uses: Apple-Actions/import-codesign-certs@v2
@@ -95,6 +95,6 @@ runs:
         BUILD_PROVISION_PROFILE_BASE64: ${{ inputs.profile }}
       run: |
         PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
-        echo -n "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode -o $PP_PATH
+        echo -n '$BUILD_PROVISION_PROFILE_BASE64' | base64 --decode -o $PP_PATH
         mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
         cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
