@@ -1,5 +1,5 @@
-use rodio::cpal::{self, source::Source, traits::HostTrait, Decoder, OutputStream};
-use rodio::{Decoder, OutputStream, Sink};
+use rodio::cpal::{self, traits::HostTrait};
+use rodio::{source::Source, Decoder, OutputStream, Sink};
 use std::io::Cursor;
 use tauri::api::file::read_binary;
 use tauri::command;
