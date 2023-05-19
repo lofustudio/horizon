@@ -79,7 +79,21 @@ runs:
       run: yarn tauri ios init
       env:
         TAURI_APPLE_DEVELOPMENT_TEAM: "PIPPAGAY"
-        CODE_SIGN_STYLE: "Manual"
-        CODE_SIGN_IDENTITY: ""
-        CODE_SIGNING_REQUIRED: "NO"
-        CODE_SIGNING_ALLOWED: "NO"
+
+    - name: install Apple certificates (ios)
+      uses: Apple-Actions/import-codesign-certs@v2
+      if: inputs.ios == '1'
+      with:
+        p12-file-base64: ${{ inputs.certificate }}
+        p12-password: ${{ inputs.certificate_password }}
+
+    - name: install provisioning profile (ios)
+      if: inputs.ios == '1'
+      shell: bash
+      env:
+        BUILD_PROVISION_PROFILE_BASE64: ${{ inputs.profile }}
+      run: |
+        PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
+        echo -n "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode -o $PP_PATH
+        mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+        cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles

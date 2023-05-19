@@ -53,19 +53,16 @@ jobs:
           path: |
             src-tauri/gen/android/horizon/app/build/outputs/apk/**/**/*.apk
 
-  build-ios:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v3
+  # build-ios:
+  #   runs-on: macos-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-      - uses: ./.github/actions/deps
-        with:
-          ios: '1'
+  #     - uses: ./.github/actions/deps
+  #       with:
+  #         ios: '1'
 
-      - name: build (ios)
-        run: yarn tauri ios build
-        env:
-          TAURI_APPLE_DEVELOPMENT_TEAM: "PIPPAGAY"
-          CODE_SIGN_IDENTITY: ""
-          CODE_SIGNING_REQUIRED: "NO"
-          CODE_SIGNING_ALLOWED: "NO"
+  #     - name: build (ios)
+  #       run: yarn tauri ios build
+  #       env:
+  #         TAURI_APPLE_DEVELOPMENT_TEAM: "PIPPAGAY"
