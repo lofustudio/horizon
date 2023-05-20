@@ -1,6 +1,7 @@
-use tauri::App;
-
 mod audio;
+
+use audio::play_file;
+use tauri::App;
 
 #[cfg(mobile)]
 mod mobile;
@@ -39,6 +40,7 @@ impl AppBuilder {
                 }
                 Ok(())
             })
+            .invoke_handler(tauri::generate_handler![play_file])
             .run(tauri::generate_context!())
             .expect("error while running tauri application");
     }

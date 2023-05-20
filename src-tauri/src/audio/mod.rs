@@ -5,7 +5,7 @@ use tauri::api::file::read_binary;
 use tauri::command;
 
 #[command]
-async fn play_file(path: String) {
+pub async fn play_file(path: String) {
     let host = cpal::default_host();
     let device = host
         .default_output_device()
