@@ -1,4 +1,6 @@
 import { useEffect } from "react"
+import { BrowserRouter, Route, Routes } from "react-router-dom"
+import Home from "./pages"
 
 export default function App() {
     useEffect(() => {
@@ -21,10 +23,10 @@ export default function App() {
     }, [])
 
     return (
-        <main className="flex flex-col items-center min-h-screen p-12 pt-24">
-            <h1 className='text-4xl font-black'>
-                Hello world.
-            </h1>
-        </main>
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<Home />} />
+            </Routes>
+        </BrowserRouter>
     )
 }
