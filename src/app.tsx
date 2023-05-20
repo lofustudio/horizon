@@ -1,8 +1,7 @@
 import { useEffect } from "react"
-import { BrowserRouter, Route, Routes } from "react-router-dom"
-import Home from "./pages"
+import WindowBar from "./components/window/bar"
 
-export default function App() {
+export default function App({ children }: { children?: React.ReactNode }) {
     useEffect(() => {
         // define a custom handler function
         // for the contextmenu event
@@ -23,10 +22,11 @@ export default function App() {
     }, [])
 
     return (
-        <BrowserRouter>
-            <Routes>
-                <Route path="/" element={<Home />} />
-            </Routes>
-        </BrowserRouter>
+        <>
+            <WindowBar />
+            <div className="mt-[36px]">
+                {children}
+            </div>
+        </>
     )
 }
