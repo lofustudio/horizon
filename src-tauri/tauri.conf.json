@@ -56,7 +56,8 @@
         "title": "Horizon",
         "width": 800,
         "height": 600,
-        "decorations": false
+        "decorations": false,
+        "center": true
       }
     ]
   }
