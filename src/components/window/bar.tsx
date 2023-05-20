@@ -16,12 +16,12 @@ function WindowButton({ children, onClick }: { children: React.ReactNode, onClic
 export default function WindowBar() {
     return (
         <>
-            <div data-tauri-drag-region className='h-[36px] bg-primary-200 dark:bg-primary-800 border-b border-black/10 dark:border-white/10 select-none flex justify-between top-0 left-0 right-0 fixed'>
+            <div data-tauri-drag-region className='h-[36px] z-[2000] bg-primary-200 dark:bg-primary-800 border-b border-black/10 dark:border-white/10 select-none flex justify-between top-0 left-0 right-0 fixed'>
                 <div className='flex flex-col items-center justify-center px-2'>
                     <img src="/light.png" className='w-[24px] h-[24px] block dark:hidden select-none' onClick={(e) => e.currentTarget.src = "/light_spinny.gif"} />
                     <img src="/dark.png" className='w-[24px] h-[24px] hidden dark:block select-none' onClick={(e) => e.currentTarget.src = "/dark_spinny.gif"} />
                 </div>
-                <div className='flex flex-row items-center justify-end'>
+                <div className='flex flex-row items-center justify-end px-1'>
                     <WindowButton onClick={() => {
                         appWindow.minimize();
                     }}>
