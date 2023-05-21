@@ -42,15 +42,6 @@ runs:
       shell: bash
       run: yarn install
 
-    - name: download NSIS (Windows)
-      # Delete when using tauri-bundler alpha.5 or above
-      if: matrix.platform == 'windows-latest'
-      shell: bash
-      run: |
-        curl.exe -o %RUNNER_TEMP%/nsis.zip "https://github.com/tauri-apps/binary-releases/releases/download/nsis-3/nsis-3.zip"
-        7z x -o %RUNNER_TEMP% %RUNNER_TEMP%/nsis.zip
-        move %RUNNER_TEMP%/nsis-3.08 %LocalAppData%/tauri/NSIS
-
     - name: setup Java (android)
       uses: actions/setup-java@v3
       if: inputs.android == '1'
