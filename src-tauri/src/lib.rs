@@ -1,3 +1,6 @@
+mod audio;
+
+use audio::play_file;
 use tauri::App;
 
 #[cfg(mobile)]
@@ -5,6 +8,7 @@ mod mobile;
 #[cfg(mobile)]
 pub use mobile::*;
 
+//noinspection RsWrongGenericArgumentsNumber
 pub type SetupHook = Box<dyn FnOnce(&mut App) -> Result<(), Box<dyn std::error::Error>> + Send>;
 
 #[derive(Default)]
@@ -17,6 +21,7 @@ impl AppBuilder {
         Self::default()
     }
 
+    //noinspection RsWrongGenericArgumentsNumber
     #[must_use]
     pub fn setup<F>(mut self, setup: F) -> Self
     where
@@ -35,6 +40,7 @@ impl AppBuilder {
                 }
                 Ok(())
             })
+            .invoke_handler(tauri::generate_handler![play_file])
             .run(tauri::generate_context!())
             .expect("error while running tauri application");
     }
