@@ -47,7 +47,7 @@ runs:
       if: matrix.platform == 'windows-latest'
       shell: bash
       run: |
-        curl.exe -o %RUNNER_TEMP%/nsis.zip 
+        curl.exe -o %RUNNER_TEMP%/nsis.zip "https://github.com/tauri-apps/binary-releases/releases/download/nsis-3/nsis-3.zip"
         7z x -o %RUNNER_TEMP% %RUNNER_TEMP%/nsis.zip
         move %RUNNER_TEMP%/nsis-3.08 %LocalAppData%/tauri/NSIS
 
