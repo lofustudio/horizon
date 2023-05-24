@@ -54,7 +54,7 @@ jobs:
         with:
           name: android
           path: |
-            src-tauri/gen/android/horizon/app/build/outputs/apk/**/**/*.apk
+            src-tauri/gen/android/app/build/outputs/apk/**/**/*.apk
 
   # build-ios:
   #   runs-on: macos-latest
