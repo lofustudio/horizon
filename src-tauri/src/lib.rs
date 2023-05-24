@@ -40,6 +40,8 @@ impl AppBuilder {
                 }
                 Ok(())
             })
+            .plugin(tauri_plugin_fs::init())
+            .plugin(tauri_plugin_window::init())
             .invoke_handler(tauri::generate_handler![play_file])
             .run(tauri::generate_context!())
             .expect("error while running tauri application");

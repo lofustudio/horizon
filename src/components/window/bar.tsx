@@ -1,6 +1,6 @@
 "use client";
 
-import { appWindow } from '@tauri-apps/api/window';
+import { appWindow } from "@tauri-apps/plugin-window";
 import React from "react";
 
 function WindowButton({ children, onClick }: { children: React.ReactNode, onClick: () => void }) {

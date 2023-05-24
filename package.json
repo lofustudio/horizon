@@ -2,6 +2,7 @@
   "name": "horizon",
   "version": "0.0.1",
   "private": true,
+  "license": "GPL-3.0-only",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -10,7 +11,8 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@tauri-apps/api": "2.0.0-alpha.3",
+    "@tauri-apps/api": "2.0.0-alpha.4",
+    "@tauri-apps/plugin-window": "https://github.com/tauri-apps/tauri-plugin-window#v2",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
     "lucide-react": "^0.220.0",
@@ -21,7 +23,7 @@
     "tailwindcss-animate": "^1.0.5"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "2.0.0-alpha.8",
+    "@tauri-apps/cli": "2.0.0-alpha.9",
     "@types/node": "^20.2.1",
     "@types/react": "^18.2.6",
     "@types/react-dom": "^18.2.4",
