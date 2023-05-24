@@ -1,4 +1,5 @@
 {
+  "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
     "beforeDevCommand": "yarn dev",
     "beforeBuildCommand": "yarn build",
@@ -11,27 +12,6 @@
     "version": "0.0.1"
   },
   "tauri": {
-    "allowlist": {
-      "all": false,
-      "shell": {
-        "all": false,
-        "open": true
-      },
-      "window": {
-        "all": false,
-        "close": true,
-        "hide": true,
-        "show": true,
-        "maximize": true,
-        "minimize": true,
-        "unmaximize": true,
-        "unminimize": true,
-        "startDragging": true
-      },
-      "path": {
-        "all": true
-      }
-    },
     "bundle": {
       "active": true,
       "category": "Music",
@@ -44,13 +24,11 @@
         "icons/icon.ico"
       ],
       "identifier": "com.lofustudio.horizon",
-      "targets": "all"
+      "targets": "all",
+      "longDescription": "Horizon is a stupidly simple music app that allows you to sync your library between devices. Seamless, secure, speedy."
     },
     "security": {
       "csp": null
-    },
-    "updater": {
-      "active": false
     },
     "windows": [
       {

@@ -2,6 +2,7 @@
   "name": "horizon",
   "version": "0.0.1",
   "private": true,
+  "license": "GPL-3.0-only",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -10,10 +11,12 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@tauri-apps/api": "2.0.0-alpha.3",
+    "@tauri-apps/api": "2.0.0-alpha.4",
+    "@tauri-apps/plugin-fs": "https://github.com/tauri-apps/tauri-plugin-fs#v2",
+    "@tauri-apps/plugin-window": "https://github.com/tauri-apps/tauri-plugin-window#v2",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
-    "lucide-react": "^0.220.0",
+    "lucide-react": "^0.221.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.11.2",
@@ -21,12 +24,12 @@
     "tailwindcss-animate": "^1.0.5"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "2.0.0-alpha.8",
-    "@types/node": "^20.2.1",
-    "@types/react": "^18.2.6",
+    "@tauri-apps/cli": "2.0.0-alpha.9",
+    "@types/node": "^20.2.3",
+    "@types/react": "^18.2.7",
     "@types/react-dom": "^18.2.4",
-    "@typescript-eslint/eslint-plugin": "^5.59.6",
-    "@typescript-eslint/parser": "^5.59.6",
+    "@typescript-eslint/eslint-plugin": "^5.59.7",
+    "@typescript-eslint/parser": "^5.59.7",
     "@vitejs/plugin-react-swc": "^3.3.1",
     "autoprefixer": "^10.4.14",
     "eslint": "^8.41.0",
