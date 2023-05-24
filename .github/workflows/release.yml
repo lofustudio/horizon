@@ -46,7 +46,9 @@ jobs:
         env:
           NDK_HOME: ${{ steps.deps.outputs.ndk-path }}
 
-      - name: get release tag
+      - name: upload
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
           gh release upload v${{ env.PACKAGE_VERSION }} ./src-tauri/gen/android/app/build/outputs/apk/**/**/*.apk
