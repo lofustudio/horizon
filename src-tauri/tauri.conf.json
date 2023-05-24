@@ -27,6 +27,9 @@
         "unmaximize": true,
         "unminimize": true,
         "startDragging": true
+      },
+      "path": {
+        "all": true
       }
     },
     "bundle": {

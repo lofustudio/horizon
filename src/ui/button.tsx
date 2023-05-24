@@ -1,7 +1,7 @@
 import { VariantProps, cva } from "class-variance-authority";
 import React from "react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "../lib/utils";
 
 const buttonVariants = cva(
     "rounded-md transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed",
