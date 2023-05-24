@@ -1,6 +1,9 @@
 name: 'test'
 on:
   pull_request:
+    branches:
+      - '*'
+      - '!stable'
   workflow_dispatch:
 
 jobs:
@@ -32,6 +35,9 @@ jobs:
           path: "${{ join(fromJSON(steps.build_os.outputs.artifactPaths), '\n') }}"
 
   build-android:
+    strategy:
+      matrix:
+        target: ["aarch64", "armv7", "i686", "x86_64"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -42,7 +48,7 @@ jobs:
           android: '1'
 
       - name: build (android)
-        run: yarn tauri android build --debug
+        run: yarn tauri android build --debug -t ${{ matrix.target }}
         env:
           NDK_HOME: ${{ steps.deps.outputs.ndk-path }}
 

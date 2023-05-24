@@ -1,6 +1,6 @@
 [package]
 name = "horizon"
-version = "0.0.1"
+version = "0.0.2"
 description = "A stupidly simple music app."
 authors = ["tygerxqt", "NyanSpaghetti"]
 license = "GPL-3.0-only"

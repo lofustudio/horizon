@@ -1,8 +1,8 @@
 name: 'release'
 on:
-  push:
+  pull_request:
     branches:
-      - stable
+      - 'stable'
   workflow_dispatch:
 
 jobs:
@@ -32,6 +32,9 @@ jobs:
           prerelease: false
 
   build-android:
+    strategy:
+      matrix:
+        target: ["aarch64", "armv7", "i686", "x86_64"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -42,7 +45,7 @@ jobs:
           android: '1'
 
       - name: build (android)
-        run: yarn tauri android build
+        run: yarn tauri android build -t ${{ matrix.target }}
         env:
           NDK_HOME: ${{ steps.deps.outputs.ndk-path }}
 
@@ -51,7 +54,7 @@ jobs:
         with:
           name: android
           path: |
-            src-tauri/gen/android/horizon/app/build/outputs/apk/**/**/*.apk
+            src-tauri/gen/android/app/build/outputs/apk/**/**/*.apk
 
   # build-ios:
   #   runs-on: macos-latest
