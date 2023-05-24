@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import WindowBar from "./components/window/bar"
+import { PlayerProvider } from "./components/player/context"
 
 export default function App({ children }: { children?: React.ReactNode }) {
     useEffect(() => {
@@ -23,12 +24,14 @@ export default function App({ children }: { children?: React.ReactNode }) {
 
     return (
         <>
-            <div className="min-h-screen transition-colors border duration-250 bg-primary-100 text-primary-900 dark:bg-primary-900 dark:text-primary-100 border-black/10 dark:border-white/10">
-                <div className="pb-[36px]">
-                    <WindowBar />
+            <PlayerProvider>
+                <div className="min-h-screen transition-colors border duration-250 bg-primary-100 text-primary-900 dark:bg-primary-900 dark:text-primary-100 border-black/10 dark:border-white/10">
+                    <div className="pb-[36px]">
+                        <WindowBar />
+                    </div>
+                    {children}
                 </div>
-                {children}
-            </div>
+            </PlayerProvider>
         </>
     )
 }

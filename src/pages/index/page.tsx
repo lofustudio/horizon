@@ -1,10 +1,12 @@
 import React from "react";
 import { Button } from "../../ui/button";
-import { invoke } from "@tauri-apps/api";
 import { readDir, BaseDirectory, FileEntry, createDir } from "@tauri-apps/plugin-fs";
 import { FileIcon, Folder } from "lucide-react";
+import { usePlayer } from "../../components/player/context";
 
 export default function Index() {
+    const { playFile } = usePlayer();
+
     const [files, setFiles] = React.useState<FileEntry[]>([]);
     const [path, setPath] = React.useState<string>("");
 
@@ -23,14 +25,6 @@ export default function Index() {
 
         findFiles();
     }, [path]);
-
-    function handleFilePlay(path: string) {
-        invoke("play_file", { path }).then(() => {
-            return true;
-        }).catch(() => {
-            return false;
-        });
-    }
 
     return (
         <>
@@ -57,7 +51,7 @@ export default function Index() {
                                     if (file.children) {
                                         setPath(file.path.split("Horizon/")[1]);
                                     } else {
-                                        handleFilePlay(file.path);
+                                        playFile(file.path);
                                     }
                                 }}>
                                     {file.children ? (
