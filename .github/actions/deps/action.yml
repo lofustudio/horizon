@@ -45,7 +45,9 @@ runs:
     - name: install tauri-cli android-fix branch (android)
       if: inputs.android == '1'
       shell: bash
-      run: cargo install tauri-cli --force --git https://github.com/simonhyll/tauri --branch android-fix
+      run: |
+        cargo install tauri-cli --git https://github.com/simonhyll/tauri --branch android-fix
+        sed -i -e 's/"tauri": "tauri"/"tauri": "cargo-tauri"/g' ./package.json
 
     - name: setup Java (android)
       uses: actions/setup-java@v3
