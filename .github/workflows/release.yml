@@ -1,8 +1,7 @@
 name: 'release'
 on:
-  push:
-    branches:
-      - 'stable'
+  release:
+    types: [created]
   workflow_dispatch:
 
 jobs:
@@ -25,11 +24,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
-          releaseName: 'Horizon v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
+          releaseId: ${{ github.event.release.id }}
+          tagName: ${{ github.event.release.tag_name }}
           releaseDraft: true
-          prerelease: false
 
   release-android:
     runs-on: ubuntu-latest
@@ -48,10 +45,10 @@ jobs:
 
       - name: upload
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
-          gh release upload v${{ env.PACKAGE_VERSION }} ./src-tauri/gen/android/app/build/outputs/apk/**/**/*.apk
+          gh release upload ${{ github.event.release.tag_name }} ./src-tauri/gen/android/app/build/outputs/apk/**/**/*.apk
 
   # build-ios:
   #   runs-on: macos-latest
