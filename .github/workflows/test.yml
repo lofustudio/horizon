@@ -1,8 +1,5 @@
 name: 'test'
 on:
-  push:
-    branches:
-      - 'stable'
   pull_request:
   workflow_dispatch:
 
