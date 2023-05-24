@@ -19,7 +19,7 @@ jobs:
 
       - uses: ./.github/actions/deps
 
-      - name: build (${{ matrix.platform }})
+      - name: build
         id: build_os
         uses: tauri-apps/tauri-action@v0
         with:
@@ -28,16 +28,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: upload ${{ matrix.platform }}
+      - name: upload
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.platform }}
           path: "${{ join(fromJSON(steps.build_os.outputs.artifactPaths), '\n') }}"
 
   build-android:
-    strategy:
-      matrix:
-        target: ["aarch64", "armv7", "i686", "x86_64"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -47,12 +44,12 @@ jobs:
         with:
           android: '1'
 
-      - name: build (android)
-        run: yarn tauri android build --debug -t ${{ matrix.target }}
+      - name: build
+        run: yarn tauri android build --debug
         env:
           NDK_HOME: ${{ steps.deps.outputs.ndk-path }}
 
-      - name: upload (android)
+      - name: upload
         uses: actions/upload-artifact@v3
         with:
           name: android

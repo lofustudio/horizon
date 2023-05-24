@@ -20,7 +20,7 @@ jobs:
       
       - uses: ./.github/actions/deps
 
-      - name: build (${{ matrix.platform }})
+      - name: build
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -31,10 +31,7 @@ jobs:
           releaseDraft: true
           prerelease: false
 
-  build-android:
-    strategy:
-      matrix:
-        target: ["aarch64", "armv7", "i686", "x86_64"]
+  release-android:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -44,17 +41,15 @@ jobs:
         with:
           android: '1'
 
-      - name: build (android)
-        run: yarn tauri android build -t ${{ matrix.target }}
+      - name: build
+        run: yarn tauri android build
         env:
           NDK_HOME: ${{ steps.deps.outputs.ndk-path }}
 
-      - name: upload (android)
-        uses: actions/upload-artifact@v3
-        with:
-          name: android
-          path: |
-            src-tauri/gen/android/app/build/outputs/apk/**/**/*.apk
+      - name: get release tag
+        run: |
+          echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+          gh release upload v${{ env.PACKAGE_VERSION }} ./src-tauri/gen/android/app/build/outputs/apk/**/**/*.apk
 
   # build-ios:
   #   runs-on: macos-latest
