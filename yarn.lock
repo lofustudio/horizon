@@ -362,6 +362,12 @@
     "@tauri-apps/cli-win32-ia32-msvc" "2.0.0-alpha.9"
     "@tauri-apps/cli-win32-x64-msvc" "2.0.0-alpha.9"
 
+"@tauri-apps/plugin-window@https://github.com/tauri-apps/tauri-plugin-window#v2":
+  version "1.0.0"
+  resolved "https://github.com/tauri-apps/tauri-plugin-window#301d61fe82d41f13a235b6bee723a7439187a900"
+  dependencies:
+    "@tauri-apps/api" "2.0.0-alpha.4"
+
 "@types/json-schema@^7.0.9":
   version "7.0.11"
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.11.tgz#d421b6c527a3037f7c84433fd2c4229e016863d3"
