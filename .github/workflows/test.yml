@@ -1,9 +1,6 @@
 name: 'test'
 on:
   pull_request:
-    branches:
-      - '*'
-      - '!stable'
   workflow_dispatch:
 
 jobs:
