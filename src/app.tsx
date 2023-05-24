@@ -23,7 +23,7 @@ export default function App({ children }: { children?: React.ReactNode }) {
 
     return (
         <>
-            <div className="h-screen transition-colors border duration-250 bg-primary-100 text-primary-900 dark:bg-primary-900 dark:text-primary-100 border-black/10 dark:border-white/10">
+            <div className="min-h-screen transition-colors border duration-250 bg-primary-100 text-primary-900 dark:bg-primary-900 dark:text-primary-100 border-black/10 dark:border-white/10">
                 <div className="pb-[36px]">
                     <WindowBar />
                 </div>

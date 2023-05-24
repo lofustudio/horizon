@@ -1,5 +1,3 @@
-"use client";
-
 import { appWindow } from "@tauri-apps/plugin-window";
 import React from "react";
 

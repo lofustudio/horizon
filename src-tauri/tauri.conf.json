@@ -1,4 +1,5 @@
 {
+  "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
     "beforeDevCommand": "yarn dev",
     "beforeBuildCommand": "yarn build",
@@ -23,7 +24,8 @@
         "icons/icon.ico"
       ],
       "identifier": "com.lofustudio.horizon",
-      "targets": "all"
+      "targets": "all",
+      "longDescription": "Horizon is a stupidly simple music app that allows you to sync your library between devices. Seamless, secure, speedy."
     },
     "security": {
       "csp": null

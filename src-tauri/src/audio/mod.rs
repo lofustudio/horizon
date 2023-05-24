@@ -1,7 +1,7 @@
 use rodio::cpal::{self, traits::HostTrait};
 use rodio::{Decoder, OutputStream, Sink};
+use std::fs::read;
 use std::io::Cursor;
-use tauri::api::file::read_binary;
 use tauri::command;
 
 #[command]
@@ -13,7 +13,7 @@ pub async fn play_file(path: String) {
     let (_stream, stream_handle) =
         OutputStream::try_from_device(&device).expect("Could not play from audio device");
 
-    let file = read_binary(path).expect("Could not read from file");
+    let file = read(path).expect("Could not read from file");
     let audio = Decoder::new(Cursor::new(file)).expect("Failed to decode data from file");
 
     let sink = Sink::try_new(&stream_handle).unwrap();

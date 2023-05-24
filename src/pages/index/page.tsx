@@ -1,25 +1,31 @@
 import React from "react";
-import { Search, File, Folder } from "lucide-react";
-import { Input } from "../../ui/input";
 import { Button } from "../../ui/button";
 import { invoke } from "@tauri-apps/api";
-import { audioDir } from "@tauri-apps/api/path";
+import { readDir, BaseDirectory, FileEntry, createDir } from "@tauri-apps/plugin-fs";
+import { FileIcon, Folder } from "lucide-react";
 
 export default function Index() {
-    const [audioPath, setAudioPath] = React.useState("");
-    const [path, setPath] = React.useState("");
+    const [files, setFiles] = React.useState<FileEntry[]>([]);
+    const [path, setPath] = React.useState<string>("");
 
     React.useEffect(() => {
-        audioDir().then((res) => {
-            console.log(res)
-            setAudioPath(res);
-        }).catch((e) => console.error(e));
-    });
+        async function findFiles() {
+            await readDir(`Horizon/${path}`, { dir: BaseDirectory.Audio, recursive: true }).then((res) => {
+                setFiles(res);
+            }).catch(async (err) => {
+                await createDir(`Horizon`, { dir: BaseDirectory.Audio }).then(() => {
+                    setPath("");
+                }).catch(() => {
+                    console.error("Couldn't create Horizon folder.");
+                });
+            });
+        }
 
-    function handleFilePlay() {
-        invoke("play_file", {
-            path: `${audioPath}/${path}`
-        }).then(() => {
+        findFiles();
+    }, [path]);
+
+    function handleFilePlay(path: string) {
+        invoke("play_file", { path }).then(() => {
             return true;
         }).catch(() => {
             return false;
@@ -34,23 +40,35 @@ export default function Index() {
                         Welcome!
                     </h1>
                     <p className="text-center text-primary-500">
-                        Horzion uses your system music folder as it's path root. Specify the path to the file you want to play below.
+                        Horizon is looking for files in the "/Horizon" folder, located at your system's default music directory.
                     </p>
-                    <div className="flex flex-row items-center gap-2">
-                        <div className="flex flex-row items-center justify-center w-full px-2 border rounded-md max-h-9 dark:bg-primary-700/50 border-black/10 dark:border-white/10">
-                            <div className="flex flex-row items-center gap-2">
-                                <Folder className="w-4 h-4 shrink-0" />
-                                <p className="text-sm text-primary-500">
-                                    {audioPath}\
-                                </p>
-                            </div>
-                            <Input className="w-full p-0 bg-transparent border-none dark:bg-transparent h-9" placeholder="test.mp3" value={path} onChange={(e) => setPath(e.target.value)} />
-                        </div>
-                        <Button size="icon" onClick={() => {
-                            handleFilePlay();
-                        }}>
-                            <File className="w-4 h-4" />
-                        </Button>
+                    <div className="flex flex-col items-center gap-2">
+                        {path.length > 0 && (
+                            <Button className="flex flex-row items-center" onClick={() => {
+                                setPath(path.split("/").slice(0, -1).join("/"));
+                            }}>
+                                <Folder className="w-4 h-4" />
+                                <span className="ml-2">Go back</span>
+                            </Button>
+                        )}
+                        {files.map((file) => {
+                            return (
+                                <Button className="flex flex-row items-center" onClick={() => {
+                                    if (file.children) {
+                                        setPath(file.path.split("Horizon/")[1]);
+                                    } else {
+                                        handleFilePlay(file.path);
+                                    }
+                                }}>
+                                    {file.children ? (
+                                        <Folder className="w-4 h-4" />
+                                    ) : (
+                                        <FileIcon className="w-4 h-4" />
+                                    )}
+                                    <span className="ml-2">{file.name}</span>
+                                </Button>
+                            )
+                        })}
                     </div>
                 </div>
             </main>
