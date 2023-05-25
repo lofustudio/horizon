@@ -1,13 +1,13 @@
 mod audio;
-
-use audio::play_file;
-use tauri::{path::BaseDirectory, App, Manager};
-
 #[cfg(mobile)]
 mod mobile;
+
+use audio::{play_file, pause};
+use tauri::{path::BaseDirectory, App, Manager};
+use tauri_plugin_fs::FsExt;
 #[cfg(mobile)]
 pub use mobile::*;
-use tauri_plugin_fs::FsExt;
+use crate::audio::Audio;
 
 //noinspection RsWrongGenericArgumentsNumber
 pub type SetupHook = Box<dyn FnOnce(&mut App) -> Result<(), Box<dyn std::error::Error>> + Send>;
@@ -37,7 +37,8 @@ impl AppBuilder {
         tauri::Builder::default()
             .plugin(tauri_plugin_fs::init())
             .plugin(tauri_plugin_window::init())
-            .invoke_handler(tauri::generate_handler![play_file])
+            .manage(Audio::default())
+            .invoke_handler(tauri::generate_handler![play_file, pause])
             .setup(move |app| {
                 if let Some(setup) = setup {
                     (setup)(app)?;
@@ -45,9 +46,7 @@ impl AppBuilder {
 
                 let audio_path = app.path().resolve("", BaseDirectory::Audio)?;
 
-                std::fs::read_dir(&audio_path).err().map(|_| {
-                    std::fs::create_dir(&audio_path).expect("Could not create audio directory");
-                });
+                if std::fs::read_dir(&audio_path).err().is_some() { std::fs::create_dir(&audio_path).expect("Could not create audio directory") }
 
                 app.fs_scope().allow_directory(audio_path, true)?;
 
