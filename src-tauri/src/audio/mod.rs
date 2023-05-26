@@ -1,12 +1,41 @@
+mod thread;
+
 use rodio::cpal::{self, traits::HostTrait};
-use rodio::{Decoder, OutputStream, Sink};
-use std::fs::read;
-use std::io::Cursor;
+use rodio::{Device, OutputStream, Sink};
+use std::sync::mpsc::{channel, Receiver, Sender};
 use std::sync::Mutex;
+use std::thread::spawn;
 use tauri::{command, State};
+use crate::audio::thread::Command;
+use crate::audio::thread::{PlayFile, Pause};
 
 pub struct Audio {
-    sink: Mutex<Sink>
+    // Consider sync_channel
+    sender: Mutex<Sender<Command>>
+}
+
+impl Audio {
+    fn new(device: Device) -> Self {
+        let (tx, rx): (Sender<Command>, Receiver<Command>) = channel();
+
+        let _join_handle = spawn(move || {
+            let (_stream, stream_handle) =
+                OutputStream::try_from_device(&device).expect("Could not play from audio device");
+
+            let sink = Sink::try_new(&stream_handle).unwrap();
+
+            while let Ok(cmd) = rx.recv() {
+                match cmd {
+                    Command::PlayFile(t) => t.run(&sink),
+                    Command::Pause(t) => t.run(&sink)
+                }
+            }
+        });
+
+        Self {
+            sender: Mutex::new(tx)
+        }
+    }
 }
 
 impl Default for Audio {
@@ -15,34 +44,23 @@ impl Default for Audio {
         let device = host
             .default_output_device()
             .expect("No output device found");
-        let (_stream, stream_handle) =
-            OutputStream::try_from_device(&device).expect("Could not play from audio device");
 
-        Self {
-            sink: Mutex::new(Sink::try_new(&stream_handle).unwrap()),
-        }
+        Audio::new(device)
     }
 }
 
 #[command]
-pub async fn play_file<'r>(path: String, audio: State<'r, Audio>) -> Result<(), ()> {
-    let file = read(path).expect("Could not read from file");
-    let cursor = Decoder::new(Cursor::new(file)).expect("Failed to decode data from file");
+pub async fn play_file(path: String, audio: State<'_, Audio>) -> Result<(), ()> {
+    let x = Command::PlayFile(PlayFile::new(path));
+    audio.sender.lock().unwrap().send(x).expect("Failed to send file");
 
-    let sink = audio.sink.lock().unwrap();
-    sink.set_volume(0.5);
-    sink.append(cursor);
-    // sink.sleep_until_end();
-
-    println!("Playing file!");
     Ok(())
 }
 
 #[command]
-pub async fn pause<'r>(audio: State<'r, Audio>) -> Result<(), ()> {
-    let sink = audio.sink.lock().unwrap();
-    if sink.is_paused() { sink.pause() } else { sink.play() }
+pub async fn pause(audio: State<'_, Audio>) -> Result<(), ()> {
+    let x = Command::Pause(Pause::new());
+    audio.sender.lock().unwrap().send(x).expect("Failed to pause");
 
-    println!("Paused!");
     Ok(())
 }
