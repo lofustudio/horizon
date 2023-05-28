@@ -7,7 +7,7 @@ use tauri::{path::BaseDirectory, App, Manager};
 use tauri_plugin_fs::FsExt;
 #[cfg(mobile)]
 pub use mobile::*;
-use crate::audio::Audio;
+use crate::audio::PlaybackState;
 
 //noinspection RsWrongGenericArgumentsNumber
 pub type SetupHook = Box<dyn FnOnce(&mut App) -> Result<(), Box<dyn std::error::Error>> + Send>;
@@ -37,7 +37,6 @@ impl AppBuilder {
         tauri::Builder::default()
             .plugin(tauri_plugin_fs::init())
             .plugin(tauri_plugin_window::init())
-            .manage(Audio::default())
             .invoke_handler(tauri::generate_handler![play_file, pause])
             .setup(move |app| {
                 if let Some(setup) = setup {
@@ -49,6 +48,8 @@ impl AppBuilder {
                 if std::fs::read_dir(&audio_path).err().is_some() { std::fs::create_dir(&audio_path).expect("Could not create audio directory") }
 
                 app.fs_scope().allow_directory(audio_path, true)?;
+
+                PlaybackState::setup(app.handle());
 
                 Ok(())
             })

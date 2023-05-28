@@ -1,66 +1,73 @@
-mod thread;
-
+use std::fs::read;
+use std::io::Cursor;
+use std::mem::ManuallyDrop;
 use rodio::cpal::{self, traits::HostTrait};
-use rodio::{Device, OutputStream, Sink};
-use std::sync::mpsc::{channel, Receiver, Sender};
+use rodio::{Decoder, Device, OutputStream, Sink};
+use std::sync::mpsc::{channel, Sender};
 use std::sync::Mutex;
 use std::thread::spawn;
-use tauri::{command, State};
-use crate::audio::thread::Command;
-use crate::audio::thread::{PlayFile, Pause};
+use tauri::{AppHandle, command, Manager, State, Wry};
+use serde::Serialize;
 
-pub struct Audio {
-    // Consider sync_channel
-    sender: Mutex<Sender<Command>>
+#[derive(Serialize)]
+pub struct PlaybackState {
+    #[serde(skip_serializing)]
+    sink: Option<Sink>,
+    #[serde(skip_serializing)]
+    sender: Sender<Device>,
 }
 
-impl Audio {
-    fn new(device: Device) -> Self {
-        let (tx, rx): (Sender<Command>, Receiver<Command>) = channel();
+impl PlaybackState {
+    fn new(sender: Sender<Device>) -> Self {
+        Self {
+            sink: None,
+            sender
+        }
+    }
 
-        let _join_handle = spawn(move || {
-            let (_stream, stream_handle) =
-                OutputStream::try_from_device(&device).expect("Could not play from audio device");
+    pub fn setup(app: AppHandle<Wry>) {
+        let (sender, rx) = channel::<Device>();
+        app.manage(Mutex::new(PlaybackState::new(sender.clone())));
 
-            let sink = Sink::try_new(&stream_handle).unwrap();
+        spawn(move || {
+            // Prevent stream being dropped at the end of loop
+            #[allow(unused_assignments)]
+            let mut stream = OutputStream::try_default().expect("No output devices found");
 
-            while let Ok(cmd) = rx.recv() {
-                match cmd {
-                    Command::PlayFile(t) => t.run(&sink),
-                    Command::Pause(t) => t.run(&sink)
-                }
+            while let Ok(message) = rx.recv() {
+                stream = OutputStream::try_from_device(&message).expect("Failed to use provided Device");
+                let sink = Sink::try_new(&stream.1).unwrap();
+                let state_mutex = app.state::<Mutex<PlaybackState>>();
+                let mut state = state_mutex.lock().unwrap();
+                state.sink = Some(sink);
             }
         });
 
-        Self {
-            sender: Mutex::new(tx)
-        }
-    }
-}
-
-impl Default for Audio {
-    fn default() -> Self {
         let host = cpal::default_host();
-        let device = host
-            .default_output_device()
-            .expect("No output device found");
+        let default = host.default_output_device().expect("No output device available");
+        sender.send(default).expect("Failed to send Device");
+    }
 
-        Audio::new(device)
+    pub fn change(&self, device: Device) {
+        self.sender.send(device).expect("Failed to send Device");
     }
 }
 
 #[command]
-pub async fn play_file(path: String, audio: State<'_, Audio>) -> Result<(), ()> {
-    let x = Command::PlayFile(PlayFile::new(path));
-    audio.sender.lock().unwrap().send(x).expect("Failed to send file");
+pub async fn play_file(path: String, audio: State<'_, Mutex<PlaybackState>>) -> Result<(), ()> {
+    let file = read(path).expect("Could not read from file");
+    let cursor = Decoder::new(Cursor::new(file)).expect("Failed to decode data from file");
+
+    audio.lock().unwrap().sink.as_ref().unwrap().append(cursor);
 
     Ok(())
 }
 
 #[command]
-pub async fn pause(audio: State<'_, Audio>) -> Result<(), ()> {
-    let x = Command::Pause(Pause::new());
-    audio.sender.lock().unwrap().send(x).expect("Failed to pause");
+pub async fn pause(audio: State<'_, Mutex<PlaybackState>>) -> Result<(), ()> {
+    let playback = audio.lock().unwrap();
+    let sink = playback.sink.as_ref().unwrap();
+    if sink.is_paused() { sink.play() } else { sink.pause() }
 
     Ok(())
 }
