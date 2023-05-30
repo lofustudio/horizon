@@ -70,19 +70,17 @@ pub async fn play_file(path: String, audio: State<'_, Mutex<PlaybackState>>) -> 
 
     println!("Duration: {}s", properties.duration().as_secs());
 
-    let file = read(path).expect("Could not read from file");
+    let file = read(&path).expect("Could not read from file");
     let cursor = Decoder::new(Cursor::new(file)).expect("Failed to decode data from file");
     audio.lock().unwrap().sink.as_ref().unwrap().append(cursor);
 
     let result = json!({
-        "duration": {
-            "seconds": properties.duration().as_secs(),
-            "ms": properties.duration().as_millis(),
-        },
-        "title": tag.title().as_deref().unwrap_or("None"),
-        "artist": tag.artist().as_deref().unwrap_or("None"),
-        "album": tag.album().as_deref().unwrap_or("None"),
-        "genre": tag.genre().as_deref().unwrap_or("None"),
+        "title": tag.title().as_deref().unwrap_or("Unknown").to_string(),
+        "artist": tag.artist().as_deref().unwrap_or("Unknown").to_string(),
+        "album": tag.album().as_deref().unwrap_or("Unknown").to_string(),
+        "genre": tag.genre().as_deref().unwrap_or("Unknown").to_string(),
+        "path": path,
+        "duration": properties.duration().as_millis(),
     });
 
     Ok(result)
