@@ -52,9 +52,35 @@ function DesktopPlayerControls() {
 }
 
 function MobilePlayerControls() {
+    const { paused, togglePause, currentTrack } = usePlayer();
     return (
         <>
-
+            <div className="flex flex-row items-center justify-start w-full gap-3">
+                <img src="https://via.placeholder.com/1080x1080/eee?text=Album" className="w-8 h-8" />
+                <div className="flex flex-col justify-start w-full">
+                    <h2 className="font-semibold text-left">
+                        {currentTrack?.title === "None" ? currentTrack.path.split("Horizon\\")[1] : currentTrack?.title}
+                    </h2>
+                    <p className="text-sm text-left text-primary-300">
+                        {currentTrack?.artist === "None" ? "Unknown artist" : currentTrack?.artist}
+                    </p>
+                </div>
+            </div>
+            <div className="flex flex-row items-center justify-end gap-6">
+                <button>
+                    <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1rem" width="1rem" xmlns="http://www.w3.org/2000/svg"><path d="M170.7 256L448 448V64L170.7 256zM64 64h64v384H64z"></path></svg>
+                </button>
+                <Button className="flex flex-row items-center p-2" onClick={() => togglePause()}>
+                    {paused ? (
+                        <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1rem" width="1rem" xmlns="http://www.w3.org/2000/svg"><path d="M96 52v408l320-204L96 52z"></path></svg>
+                    ) : (
+                        <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1rem" width="1rem" xmlns="http://www.w3.org/2000/svg"><path d="M96 448h106.7V64H96v384zM309.3 64v384H416V64H309.3z"></path></svg>
+                    )}
+                </Button>
+                <button>
+                    <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="1rem" width="1rem" xmlns="http://www.w3.org/2000/svg"><path d="M64 64v384l277.3-192L64 64zM384 64h64v384h-64z"></path></svg>
+                </button>
+            </div>
         </>
     )
 }
