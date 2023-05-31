@@ -1,17 +1,9 @@
 import { invoke } from "@tauri-apps/api";
-import {
-    BaseDirectory,
-    FileEntry,
-    createDir,
-    readDir
-} from "@tauri-apps/plugin-fs";
+import { emit, listen } from "@tauri-apps/api/event";
 import React from "react";
 
 export interface PlayerContext {
-    files: FileEntry[];
     tracks: HorizonTrack[];
-    currentTrack: HorizonTrack | null;
-
     playing: boolean;
     paused: boolean;
 
@@ -20,10 +12,7 @@ export interface PlayerContext {
 }
 
 export const PlayerContext = React.createContext<PlayerContext>({
-    files: [],
     tracks: [],
-    currentTrack: null,
-
     playing: false,
     paused: false,
 
@@ -33,10 +22,7 @@ export const PlayerContext = React.createContext<PlayerContext>({
 
 export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     const [mounted, setMounted] = React.useState<boolean>(false);
-
-    const [files, setFiles] = React.useState<FileEntry[]>([]);
     const [tracks, setTracks] = React.useState<HorizonTrack[]>([]);
-    const [currentTrack, setCurrentTrack] = React.useState<HorizonTrack | null>(null);
 
     const [playing, setPlaying] = React.useState<boolean>(false);
     const [paused, setPaused] = React.useState<boolean>(false);
@@ -44,7 +30,6 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     const playFile = async (path: string) => {
         await invoke("play_file", { path }).then((res: any) => {
             setPlaying(true);
-            setCurrentTrack({ ...res, path });
         }).catch((err) => {
             console.error(err);
         });
@@ -61,40 +46,27 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     React.useEffect(() => {
-        setMounted(true);
+        const unlisten = listen<HorizonTrack[]>("tracks", (e) => {
+            console.log("Mounted payload: ", e.payload);
+            setTracks(e.payload);
+            setMounted(true);
+        });
 
-        async function findFiles() {
-            await readDir(`Horizon`, { dir: BaseDirectory.Audio, recursive: true }).then((res) => {
-                res.forEach(async (file) => {
-                    if (file.name?.endsWith(".mp3") || file.name?.endsWith(".wav") || file.name?.endsWith(".ogg") || file.name?.endsWith(".flac") || file.children) {
-                        setFiles((files) => [...files, { ...file }]);
-                    }
-                });
-            }).catch(async (err) => {
-                await createDir(`Horizon`, { dir: BaseDirectory.Audio }).then(() => {
-                    // Trigger a re-run
-                    setMounted(true);
-                }).catch(() => {
-                    console.error("Couldn't create Horizon folder.");
-                });
-            });
+        emit("mounted");
+
+        return () => {
+            unlisten.then(f => f());
         }
-
-        findFiles();
     }, []);
 
     const value = React.useMemo(() => ({
-        files,
         tracks,
-        currentTrack,
         playing,
         paused,
         playFile,
         togglePause
     }), [
-        files,
         tracks,
-        currentTrack,
         playing,
         paused,
         playFile,
