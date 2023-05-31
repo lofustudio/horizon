@@ -1,11 +1,11 @@
 import { invoke } from "@tauri-apps/api";
 import { emit, listen } from "@tauri-apps/api/event";
 import React from "react";
+import { Status } from "../../types/Status";
 
 export interface PlayerContext {
     tracks: HorizonTrack[];
     currentTrack: HorizonTrack | null;
-    playing: boolean;
     paused: boolean;
 
     playFile: (track: HorizonTrack) => Promise<void>;
@@ -15,7 +15,6 @@ export interface PlayerContext {
 export const PlayerContext = React.createContext<PlayerContext>({
     tracks: [],
     currentTrack: null,
-    playing: false,
     paused: false,
 
     playFile: async () => { },
@@ -27,12 +26,10 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     const [currentTrack, setCurrentTrack] = React.useState<HorizonTrack | null>(null);
     const [tracks, setTracks] = React.useState<HorizonTrack[]>([]);
 
-    const [playing, setPlaying] = React.useState<boolean>(false);
     const [paused, setPaused] = React.useState<boolean>(false);
 
     const playFile = async (track: HorizonTrack) => {
         await invoke("play_file", { path: track.path }).then((res: any) => {
-            setPlaying(true);
             setCurrentTrack(track);
         }).catch((err) => {
             console.error(err);
@@ -40,17 +37,24 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     const togglePause = async () => {
-        invoke("pause").then((res) => {
-            // TODO: Get paused state from backend
-            setPaused(!paused);
-            setPlaying(!playing);
+        invoke<boolean>("toggle_pause").then((res) => {
+            setPaused(res);
+        }).catch((err) => {
+            console.error(err);
+        });
+    }
+
+    const status = async () => {
+        invoke<Status>("status").then((res) => {
+            console.log(res)
+            setPaused(res.paused)
         }).catch((err) => {
             console.error(err);
         });
     }
 
     React.useEffect(() => {
-        const unlisten = listen<HorizonTrack[]>("tracks", (e) => {
+        const unlistenTracks = listen<HorizonTrack[]>("tracks", (e) => {
             console.log("Mounted payload: ", e.payload);
             setTracks(e.payload);
             setMounted(true);
@@ -58,22 +62,22 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
 
         emit("mounted");
 
+        status();
+
         return () => {
-            unlisten.then(f => f());
+            unlistenTracks.then(f => f());
         }
     }, []);
 
     const value = React.useMemo(() => ({
         tracks,
         currentTrack,
-        playing,
         paused,
         playFile,
         togglePause
     }), [
         tracks,
         currentTrack,
-        playing,
         paused,
         playFile,
         togglePause

@@ -59,16 +59,7 @@ pub async fn play_file(path: String, audio: State<'_, Mutex<PlaybackState>>) -> 
     let tagged_file = read_from_path(&path).expect("Failed to read from path");
     // TODO: If primary tag is not found, iterate through the tags to find a suitable one
     let tag = tagged_file.primary_tag().expect("Primary tag not found");
-
-    println!("--- Tag Information ---");
-    println!("Title: {}", tag.title().as_deref().unwrap_or("None"));
-    println!("Artist: {}", tag.artist().as_deref().unwrap_or("None"));
-    println!("Album: {}", tag.album().as_deref().unwrap_or("None"));
-    println!("Genre: {}", tag.genre().as_deref().unwrap_or("None"));
-
     let properties = tagged_file.properties();
-
-    println!("Duration: {}s", properties.duration().as_secs());
 
     let file = read(&path).expect("Could not read from file");
     let cursor = Decoder::new(Cursor::new(file)).expect("Failed to decode data from file");
@@ -87,7 +78,7 @@ pub async fn play_file(path: String, audio: State<'_, Mutex<PlaybackState>>) -> 
 }
 
 #[command]
-pub async fn pause(audio: State<'_, Mutex<PlaybackState>>) -> Result<bool, ()> {
+pub async fn toggle_pause(audio: State<'_, Mutex<PlaybackState>>) -> Result<bool, ()> {
     let playback = audio.lock().unwrap();
     let sink = playback.sink.as_ref().unwrap();
     if sink.is_paused() {
