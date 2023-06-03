@@ -8,7 +8,7 @@ mod audio;
 mod tracks;
 
 use crate::{audio::PlaybackState, tracks::fetch_tracks};
-use audio::{play_file, status, toggle_pause};
+use audio::{play_file, toggle_pause};
 use tauri::{path::BaseDirectory, App, Manager};
 use tauri_plugin_fs::FsExt;
 
@@ -40,7 +40,7 @@ impl AppBuilder {
         tauri::Builder::default()
             .plugin(tauri_plugin_fs::init())
             .plugin(tauri_plugin_window::init())
-            .invoke_handler(tauri::generate_handler![play_file, toggle_pause, status])
+            .invoke_handler(tauri::generate_handler![play_file, toggle_pause])
             .setup(move |app| {
                 if let Some(setup) = setup {
                     (setup)(app)?;
