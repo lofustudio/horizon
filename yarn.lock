@@ -368,6 +368,12 @@
   dependencies:
     "@tauri-apps/api" "2.0.0-alpha.4"
 
+"@tauri-apps/plugin-os@https://github.com/tauri-apps/tauri-plugin-os#v2":
+  version "2.0.0-alpha.0"
+  resolved "https://github.com/tauri-apps/tauri-plugin-os#7a26fd5a4998b2e5258f356d4fab3629ff2b2dc8"
+  dependencies:
+    "@tauri-apps/api" "2.0.0-alpha.4"
+
 "@tauri-apps/plugin-window@https://github.com/tauri-apps/tauri-plugin-window#v2":
   version "2.0.0-alpha.0"
   resolved "https://github.com/tauri-apps/tauri-plugin-window#e490c0cff05ffb7ce8056a353e23c11129b10606"

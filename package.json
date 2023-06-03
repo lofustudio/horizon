@@ -13,6 +13,7 @@
   "dependencies": {
     "@tauri-apps/api": "2.0.0-alpha.4",
     "@tauri-apps/plugin-fs": "https://github.com/tauri-apps/tauri-plugin-fs#v2",
+    "@tauri-apps/plugin-os": "https://github.com/tauri-apps/tauri-plugin-os#v2",
     "@tauri-apps/plugin-window": "https://github.com/tauri-apps/tauri-plugin-window#v2",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",

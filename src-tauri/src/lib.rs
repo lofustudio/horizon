@@ -40,6 +40,7 @@ impl AppBuilder {
         tauri::Builder::default()
             .plugin(tauri_plugin_fs::init())
             .plugin(tauri_plugin_window::init())
+            .plugin(tauri_plugin_os::init())
             .invoke_handler(tauri::generate_handler![play_file, toggle_pause])
             .setup(move |app| {
                 if let Some(setup) = setup {
