@@ -1,69 +1,39 @@
-import React from "react";
-import { Button } from "../../ui/button";
-import { readDir, BaseDirectory, FileEntry, createDir } from "@tauri-apps/plugin-fs";
-import { FileIcon, Folder } from "lucide-react";
 import { usePlayer } from "../../components/player/context";
 
 export default function Index() {
-    const { playFile } = usePlayer();
-
-    const [files, setFiles] = React.useState<FileEntry[]>([]);
-    const [path, setPath] = React.useState<string>("");
-
-    React.useEffect(() => {
-        async function findFiles() {
-            await readDir(`Horizon/${path}`, { dir: BaseDirectory.Audio, recursive: true }).then((res) => {
-                setFiles(res);
-            }).catch(async (err) => {
-                await createDir(`Horizon`, { dir: BaseDirectory.Audio }).then(() => {
-                    setPath("");
-                }).catch(() => {
-                    console.error("Couldn't create Horizon folder.");
-                });
-            });
-        }
-
-        findFiles();
-    }, [path]);
-
+    const { tracks, playFile } = usePlayer();
     return (
         <>
-            <main className="flex flex-col items-center p-8">
-                <div className="flex flex-col items-center gap-8">
-                    <h1 className='text-3xl font-black'>
-                        Welcome!
+            <main className="flex flex-col items-start w-full gap-8 p-8">
+                <div>
+                    <h1 className="text-3xl font-bold">
+                        Your Library
                     </h1>
-                    <p className="text-center text-primary-500">
-                        Horizon is looking for files in the "/Horizon" folder, located at your system's default music directory.
+                    <p className="text-primary dark:text-primary-400">
+                        {tracks.length} tracks
                     </p>
-                    <div className="flex flex-col items-center gap-2">
-                        {path.length > 0 && (
-                            <Button className="flex flex-row items-center" onClick={() => {
-                                setPath(path.split("/").slice(0, -1).join("/"));
-                            }}>
-                                <Folder className="w-4 h-4" />
-                                <span className="ml-2">Go back</span>
-                            </Button>
-                        )}
-                        {files.map((file) => {
-                            return (
-                                <Button className="flex flex-row items-center" onClick={() => {
-                                    if (file.children) {
-                                        setPath(file.path.split("Horizon/")[1]);
-                                    } else {
-                                        playFile(file.path);
-                                    }
-                                }}>
-                                    {file.children ? (
-                                        <Folder className="w-4 h-4" />
-                                    ) : (
-                                        <FileIcon className="w-4 h-4" />
-                                    )}
-                                    <span className="ml-2">{file.name}</span>
-                                </Button>
-                            )
-                        })}
-                    </div>
+                </div>
+                <div className="flex flex-col w-full">
+                    {tracks.map((t) => {
+                        return (
+                            <>
+                                <div key={t.path} className="flex flex-row items-center justify-between p-2 transition-colors duration-150 hover:cursor-pointer hover:bg-primary-200 dark:hover:bg-primary-700/50" onClick={() => playFile(t)}>
+                                    <div className="flex flex-row gap-2">
+                                        <img src="https://via.placeholder.com/48x48/eee?text=Album" />
+                                        <div className="flex flex-col">
+                                            <h1 className="font-medium overflow-ellipsis text-md whitespace-nowrap">
+                                                {t.title}
+                                            </h1>
+                                            <p>
+                                                {t.artist}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 3 16" height="20px" width="20px" xmlns="http://www.w3.org/2000/svg" className="h-full"><path fillRule="evenodd" d="M0 2.5a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zm0 5a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zM1.5 14a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"></path></svg>
+                                </div>
+                            </>
+                        )
+                    })}
                 </div>
             </main>
         </>
