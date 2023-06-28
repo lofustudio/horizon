@@ -8,10 +8,10 @@ repository = "https://github.com/lofustudio/horizon"
 edition = "2021"
 
 [build-dependencies]
-tauri-build = { version = "=2.0.0-alpha.5", features = [] }
+tauri-build = { version = "=2.0.0-alpha.6", features = [] }
 
 [dependencies]
-tauri = { version = "=2.0.0-alpha.9", features = [] }
+tauri = { version = "=2.0.0-alpha.10", features = [] }
 tauri-plugin-fs = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }
 tauri-plugin-window = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }
 tauri-plugin-os = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }
