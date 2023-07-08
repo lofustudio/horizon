@@ -1,40 +1,46 @@
-import { useEffect, useState } from "react"
-import WindowBar from "./components/window/bar"
-import { PlayerProvider } from "./components/player/context"
-import PlayerControls from "./components/player/controls"
-import { platform } from "@tauri-apps/plugin-os"
+import { type Component, createEffect, createSignal, Show } from 'solid-js';
+import { Route, Routes } from '@solidjs/router';
+import { platform } from '@tauri-apps/plugin-os';
+import WindowBar from './components/window/bar';
 
-export default function App({ children }: { children?: React.ReactNode }) {
-    const [mobile, setMobile] = useState(false);
-    useEffect(() => {
-        platform().then((platform) => {
-            if (platform === "android" || platform === "ios") {
-                setMobile(true);
-            }
-        });
+import IndexPage from './pages/index';
+import ThemeContextProvider from './context/theme';
+import SettingsContextProvider, { useSettings } from './context/settings';
+import SetupPage from './pages/setup';
 
-        const handleContextMenu = (e: any) => { e.preventDefault() };
+const App: Component = () => {
+  const [mobile, setMobile] = createSignal(false);
 
-        document.addEventListener("contextmenu", handleContextMenu)
+  createEffect(async () => {
+    await platform().then((platform) => {
+      if (platform === "android" || platform === "ios") {
+        setMobile(true);
+      }
+    });
 
-        return () => {
-            document.removeEventListener("contextmenu", handleContextMenu)
-        }
-    }, []);
+    const handleContextMenu = (e: any) => { e.preventDefault() };
 
-    return (
-        <>
-            <div className="min-h-screen transition-colors border duration-250 bg-primary-100 text-primary-900 dark:bg-primary-900 dark:text-primary-100 border-black/10 dark:border-white/10">
-                <PlayerProvider>
-                    <div className="pb-[36px] data-[mobile=true]:hidden" data-mobile={mobile}>
-                        <WindowBar />
-                    </div>
-                    {children}
-                    <div className="pt-[64px]">
-                        <PlayerControls />
-                    </div>
-                </PlayerProvider>
-            </div>
-        </>
-    )
-}
+    document.addEventListener("contextmenu", handleContextMenu)
+
+    return () => {
+      document.removeEventListener("contextmenu", handleContextMenu)
+    }
+  });
+
+  return (
+    <ThemeContextProvider>
+      <main class='w-full h-full bg-white dark:bg-black text-black dark:text-white'>
+        <nav id='nav' class='fixed z-10 top-0 w-full h-[36px] data-[mobile=true]:hidden' data-mobile={mobile()}>
+          <WindowBar />
+        </nav>
+        <SettingsContextProvider>
+          <Routes>
+            <Route path='/' element={<IndexPage />} />
+          </Routes>
+        </SettingsContextProvider >
+      </main>
+    </ThemeContextProvider>
+  );
+};
+
+export default App;
