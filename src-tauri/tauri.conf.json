@@ -1,5 +1,4 @@
 {
-  "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
     "beforeDevCommand": "yarn dev",
     "beforeBuildCommand": "yarn build",
@@ -15,6 +14,10 @@
     "bundle": {
       "active": true,
       "category": "Music",
+      "shortDescription": "Your music library, everywhere.",
+      "longDescription": "Horizon is a stupidly simple music app that allows you to sync your library between devices.",
+      "identifier": "studio.lofu.horizon",
+      "publisher": "Lofu Studio",
       "copyright": "Lofu Studio",
       "icon": [
         "icons/32x32.png",
@@ -23,22 +26,33 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "studio.lofu.horizon",
-      "targets": "all",
-      "longDescription": "Horizon is a stupidly simple music app that allows you to sync your library between devices. Seamless, secure, speedy."
+      "targets": "all"
+    },
+    "systemTray": {
+      "title": "Horizon",
+      "menuOnLeftClick": true,
+      "iconPath": "icons/icon.ico"
     },
     "security": {
-      "csp": null
+      "csp": {
+        "default-src": "'none'",
+        "style-src": "'self' 'unsafe-inline'",
+        "img-src": "'self' data: https:",
+        "media-src": "https:",
+        "font-src": "'self'",
+        "connect-src": "https: wss:"
+      }
     },
     "windows": [
       {
-        "fullscreen": false,
-        "resizable": true,
         "title": "Horizon",
+        "label": "Horizon",
         "width": 800,
         "height": 600,
-        "decorations": false,
-        "center": true
+        "fullscreen": false,
+        "center": true,
+        "resizable": true,
+        "decorations": false
       }
     ]
   }
