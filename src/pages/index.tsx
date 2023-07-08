@@ -1,20 +1,9 @@
 import { useSettings } from "@/context/settings";
-import { Component, Show, createEffect } from "solid-js";
+import { Component, Show } from "solid-js";
 import SetupPage from "./setup";
-import { Howl } from "howler";
 
 const IndexPage: Component = () => {
-    const { state } = useSettings();
-
-    createEffect(() => {
-        var sound = new Howl({
-            src: ['https://listen.moe/fallback'],
-            html5: true,
-            volume: 0.1
-        });
-
-        sound.play();
-    });
+    const { state, set } = useSettings();
 
     return (
         <>
