@@ -23,7 +23,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.lofustudio.horizon",
+      "identifier": "studio.lofu.horizon",
       "targets": "all",
       "longDescription": "Horizon is a stupidly simple music app that allows you to sync your library between devices. Seamless, secure, speedy."
     },
