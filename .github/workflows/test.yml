@@ -1,8 +1,5 @@
 name: 'test'
 on:
-  push:
-    branches:
-      - 'stable'
   pull_request:
   workflow_dispatch:
 
@@ -19,7 +16,7 @@ jobs:
 
       - uses: ./.github/actions/deps
 
-      - name: build (${{ matrix.platform }})
+      - name: build
         id: build_os
         uses: tauri-apps/tauri-action@v0
         with:
@@ -28,7 +25,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: upload ${{ matrix.platform }}
+      - name: upload
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.platform }}
@@ -44,12 +41,12 @@ jobs:
         with:
           android: '1'
 
-      - name: build (android)
+      - name: build
         run: yarn tauri android build --debug
         env:
           NDK_HOME: ${{ steps.deps.outputs.ndk-path }}
 
-      - name: upload (android)
+      - name: upload
         uses: actions/upload-artifact@v3
         with:
           name: android

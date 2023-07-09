@@ -42,11 +42,11 @@ runs:
       shell: bash
       run: yarn install
 
-    - name: install tauri-cli android-fix branch (android)
-      if: inputs.android == '1'
+    - name: install tauri-cli zip deflate fix (windows)
+      if: matrix.platform == 'windows-latest'
       shell: bash
       run: |
-        cargo install tauri-cli --git https://github.com/simonhyll/tauri --branch android-fix
+        cargo install tauri-cli --git https://github.com/tauri-apps/tauri
         sed -i -e 's/"tauri": "tauri"/"tauri": "cargo-tauri"/g' ./package.json
 
     - name: setup Java (android)

@@ -1,6 +1,6 @@
 {
   "name": "horizon",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "private": true,
   "license": "GPL-3.0-only",
   "scripts": {
@@ -11,8 +11,9 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@tauri-apps/api": "2.0.0-alpha.4",
+    "@tauri-apps/api": "2.0.0-alpha.5",
     "@tauri-apps/plugin-fs": "https://github.com/tauri-apps/tauri-plugin-fs#v2",
+    "@tauri-apps/plugin-os": "https://github.com/tauri-apps/tauri-plugin-os#v2",
     "@tauri-apps/plugin-window": "https://github.com/tauri-apps/tauri-plugin-window#v2",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
@@ -24,7 +25,7 @@
     "tailwindcss-animate": "^1.0.5"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "2.0.0-alpha.9",
+    "@tauri-apps/cli": "2.0.0-alpha.10",
     "@types/node": "^20.2.3",
     "@types/react": "^18.2.7",
     "@types/react-dom": "^18.2.4",
@@ -38,6 +39,6 @@
     "postcss": "^8.4.23",
     "tailwindcss": "^3.3.2",
     "typescript": "^5.0.4",
-    "vite": "^4.3.8"
+    "vite": "^4.3.9"
   }
 }

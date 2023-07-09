@@ -7,7 +7,14 @@ export default defineConfig({
   clearScreen: false,
   // Tauri expects a fixed port, fail if that port is not available
   server: {
+    host: '0.0.0.0', // listen on all addresses
+    port: 5173,
     strictPort: true,
+    hmr: {
+      protocol: 'ws',
+      host: '192.168.1.120',
+      port: 5183,
+    },
   },
   // to make use of `TAURI_PLATFORM`, `TAURI_ARCH`, `TAURI_FAMILY`,
   // `TAURI_PLATFORM_VERSION`, `TAURI_PLATFORM_TYPE` and `TAURI_DEBUG`

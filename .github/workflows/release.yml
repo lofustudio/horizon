@@ -1,9 +1,7 @@
 name: 'release'
 on:
-  push:
-    branches:
-      - stable
-  workflow_dispatch:
+  release:
+    types: [created]
 
 jobs:
   release-os:
@@ -20,18 +18,16 @@ jobs:
       
       - uses: ./.github/actions/deps
 
-      - name: build (${{ matrix.platform }})
+      - name: build
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
-          releaseName: 'Horizon v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
+          releaseId: ${{ github.event.release.id }}
+          tagName: ${{ github.event.release.tag_name }}
           releaseDraft: true
-          prerelease: false
 
-  build-android:
+  release-android:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -41,17 +37,17 @@ jobs:
         with:
           android: '1'
 
-      - name: build (android)
+      - name: build
         run: yarn tauri android build
         env:
           NDK_HOME: ${{ steps.deps.outputs.ndk-path }}
 
-      - name: upload (android)
-        uses: actions/upload-artifact@v3
-        with:
-          name: android
-          path: |
-            src-tauri/gen/android/horizon/app/build/outputs/apk/**/**/*.apk
+      - name: upload
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+          gh release upload ${{ github.event.release.tag_name }} ./src-tauri/gen/android/app/build/outputs/apk/**/**/*.apk
 
   # build-ios:
   #   runs-on: macos-latest
