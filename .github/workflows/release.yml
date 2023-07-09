@@ -23,9 +23,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          releaseId: ${{ github.event.release.id }}
           tagName: ${{ github.event.release.tag_name }}
-          releaseDraft: true
 
   release-android:
     runs-on: ubuntu-latest
@@ -47,7 +45,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
-          gh release upload ${{ github.event.release.tag_name }} ./src-tauri/gen/android/app/build/outputs/apk/**/**/*.apk
+          gh release upload ${{ github.event.release.tag_name }} ./src-tauri/gen/android/app/build/outputs/apk/**/**/*.apk --clobber
 
   # build-ios:
   #   runs-on: macos-latest
