@@ -1,5 +1,4 @@
 use std::{ffi::OsStr, path::PathBuf};
-
 use lofty::{read_from_path, Accessor, AudioFile, TaggedFileExt};
 use serde_json::{json, Value};
 use tauri::command;
@@ -15,7 +14,7 @@ pub fn fetch_tracks(path: PathBuf) -> Result<Vec<Value>, Box<dyn std::error::Err
             let file_name = file
                 .path()
                 .file_name()
-                .unwrap_or(&OsStr::new("Unknown"))
+                .unwrap_or(OsStr::new("Unknown"))
                 .to_str()
                 .unwrap_or("Unknown");
             let tagged_file = read_from_path(file.path()).expect("Failed to read file");
