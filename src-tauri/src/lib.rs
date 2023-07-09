@@ -5,10 +5,9 @@ mod mobile;
 pub use mobile::*;
 
 mod audio;
-mod tracks;
 
-use crate::{audio::PlaybackState, tracks::fetch_tracks};
-use audio::{play_file, toggle_pause};
+use crate::audio::{PlaybackState, tracks::fetch_tracks};
+use audio::{play_file, queue_file, toggle_pause};
 use tauri::{path::BaseDirectory, App, Manager};
 use tauri_plugin_fs::FsExt;
 
@@ -41,7 +40,7 @@ impl AppBuilder {
             .plugin(tauri_plugin_fs::init())
             .plugin(tauri_plugin_window::init())
             .plugin(tauri_plugin_os::init())
-            .invoke_handler(tauri::generate_handler![play_file, toggle_pause])
+            .invoke_handler(tauri::generate_handler![play_file, queue_file, toggle_pause])
             .setup(move |app| {
                 if let Some(setup) = setup {
                     (setup)(app)?;
