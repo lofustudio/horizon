@@ -24,16 +24,13 @@ jobs:
 
       - name: build
         uses: tauri-apps/tauri-action@v0
+        id: build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: upload
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          for x in ${{ steps.build.outputs.artifactPaths }}; do
-            gh release upload ${{ inputs.tag }} $x --clobber
-          done
+        with:
+          tagName: ${{ inputs.tag }}
+          releaseName: 'Horizon ${{ inputs.tag }}'
+          releaseDraft: true
 
   release-android:
     runs-on: ubuntu-latest
