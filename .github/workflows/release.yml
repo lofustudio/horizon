@@ -26,8 +26,12 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tagName: ${{ inputs.tag }}
+
+      - name: upload
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${{ inputs.tag }} ./src-tauri/target/release/bundle/**/* --clobber
 
   release-android:
     runs-on: ubuntu-latest
@@ -48,7 +52,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
           gh release upload ${{ inputs.tag }} ./src-tauri/gen/android/app/build/outputs/apk/**/**/*.apk --clobber
 
   # build-ios:
