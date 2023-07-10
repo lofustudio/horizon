@@ -31,7 +31,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload ${{ inputs.tag }} ./src-tauri/target/release/bundle/**/* --clobber
+          for x in ${{ steps.build.outputs.artifactPaths }}; do
+            gh release upload ${{ inputs.tag }} $x --clobber
+          done
 
   release-android:
     runs-on: ubuntu-latest
