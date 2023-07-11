@@ -1,0 +1,9 @@
+CREATE TABLE library (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    path TEXT NOT NULL,
+    title TEXT NOT NULL DEFAULT 'Unknown',
+    artist TEXT NOT NULL DEFAULT 'Unknown',
+    album TEXT NOT NULL DEFAULT 'Unknown',
+    genre TEXT NOT NULL DEFAULT 'Unknown',
+    duration INTEGER NOT NULL DEFAULT 0
+);

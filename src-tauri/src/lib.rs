@@ -32,7 +32,8 @@ impl AppBuilder {
         self
     }
 
-    pub fn run(self) {
+    #[tokio::main]
+    pub async fn run(self) {
         let setup = self.setup;
         tauri::Builder::default()
             .plugin(tauri_plugin_fs::init())
@@ -45,7 +46,7 @@ impl AppBuilder {
                     (setup)(app)?;
                 }
 
-                // Set up the database
+                // Set up the database first
                 database::setup(app.handle());
 
                 // Set up the backend
