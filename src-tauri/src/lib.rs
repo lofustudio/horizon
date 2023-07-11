@@ -8,6 +8,7 @@ mod audio;
 mod database;
 
 use tauri::App;
+use crate::audio::discover::files::fetch_tracks;
 
 //noinspection RsWrongGenericArgumentsNumber
 pub type SetupHook = Box<dyn FnOnce(&mut App) -> Result<(), Box<dyn std::error::Error>> + Send>;
@@ -40,7 +41,7 @@ impl AppBuilder {
             .plugin(tauri_plugin_window::init())
             .plugin(tauri_plugin_os::init())
             // Make commands invokable from frontend
-            .invoke_handler(tauri::generate_handler![])
+            .invoke_handler(tauri::generate_handler![fetch_tracks])
             .setup(move |app| {
                 if let Some(setup) = setup {
                     (setup)(app)?;

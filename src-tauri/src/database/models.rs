@@ -1,6 +1,7 @@
 use diesel::prelude::*;
+use serde::Serialize;
 
-#[derive(Queryable, Selectable, Identifiable)]
+#[derive(Queryable, Selectable, Identifiable, Serialize)]
 #[diesel(table_name = crate::database::schema::library)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Library {

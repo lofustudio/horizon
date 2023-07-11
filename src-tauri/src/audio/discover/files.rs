@@ -1,21 +1,14 @@
-use crate::database::models::NewLibrary;
-use diesel::{insert_into, RunQueryDsl, SqliteConnection};
-use serde_json::Value;
+use diesel::{insert_into, QueryDsl, RunQueryDsl, SelectableHelper, SqliteConnection};
+use serde_json::{json, Value};
 use std::ops::DerefMut;
 use std::path::Path;
 use std::sync::Mutex;
 use tauri::{command, State};
 use walkdir::WalkDir;
 
-#[command]
-pub fn fetch_tracks(path: &Path) -> Result<Vec<Value>, Box<dyn std::error::Error>> {
-    let mut tracks: Vec<Value> = Vec::new();
-
-    todo!("Columns in Library to Vec, and then return")
-}
-
 pub fn save_tracks(path: &Path, db: State<Mutex<SqliteConnection>>) {
     use crate::database::schema::library;
+    use crate::database::models::NewLibrary;
 
     for file in WalkDir::new(path).into_iter().filter_map(|file| file.ok()) {
         if file.metadata().unwrap().is_file() {
@@ -29,4 +22,16 @@ pub fn save_tracks(path: &Path, db: State<Mutex<SqliteConnection>>) {
                 .execute(conn.deref_mut());
         }
     }
+}
+
+#[command]
+pub fn fetch_tracks(db: State<Mutex<SqliteConnection>>) -> Result<Vec<Value>, ()> {
+    use crate::database::schema::library::dsl::library;
+    use crate::database::models::Library;
+
+    // Fetch library entries from database
+    let mut conn = db.lock().unwrap();
+    let lib = library.select(Library::as_select()).load(conn.deref_mut()).expect("Failed to select from database");
+    let test = lib.iter().map(|x| json!(x)).collect();
+    Ok(test)
 }

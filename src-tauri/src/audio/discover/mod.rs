@@ -1,6 +1,6 @@
 pub(crate) mod files;
 
-use crate::audio::discover::files::{fetch_tracks, save_tracks};
+use crate::audio::discover::files::save_tracks;
 use diesel::SqliteConnection;
 use std::sync::Mutex;
 use tauri::path::BaseDirectory;
@@ -18,16 +18,4 @@ pub fn setup(app: AppHandle<Wry>) {
     // Save list of files to database
     let db = app.state::<Mutex<SqliteConnection>>();
     save_tracks(&audio_path, db);
-
-    // Listen for client mounted event
-    let clone = app.clone();
-    app.listen_global("mounted", move |_| {
-        println!("Front has mounted. Fetching tracks and status...");
-
-        // Send tracks to client
-        let tracks = fetch_tracks(&audio_path).expect("Failed to fetch tracks");
-        clone
-            .emit_all("tracks", tracks)
-            .expect("Could not emit tracks");
-    });
 }

@@ -1,4 +1,4 @@
-mod discover;
+pub(crate) mod discover;
 
 use tauri::{AppHandle, Wry};
 
