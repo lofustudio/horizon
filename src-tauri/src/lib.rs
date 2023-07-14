@@ -7,8 +7,8 @@ pub use mobile::*;
 mod audio;
 mod database;
 
-use tauri::App;
 use crate::audio::discover::files::fetch_tracks;
+use tauri::App;
 
 //noinspection RsWrongGenericArgumentsNumber
 pub type SetupHook = Box<dyn FnOnce(&mut App) -> Result<(), Box<dyn std::error::Error>> + Send>;

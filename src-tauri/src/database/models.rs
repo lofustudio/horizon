@@ -32,4 +32,12 @@ pub struct NewLibrary {
 pub struct Queue {
     pub id: i32,
     pub library_id: i32,
+    pub play_order: i32,
+}
+
+#[derive(Insertable)]
+#[diesel(table_name = crate::database::schema::queue)]
+pub struct NewQueue {
+    pub library_id: i32,
+    pub play_order: i32,
 }

@@ -16,6 +16,7 @@ diesel::table! {
     queue (id) {
         id -> Integer,
         library_id -> Integer,
+        play_order -> Integer,
     }
 }
 

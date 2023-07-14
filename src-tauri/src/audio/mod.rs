@@ -1,4 +1,5 @@
 pub(crate) mod discover;
+mod play;
 
 use tauri::{AppHandle, Wry};
 
