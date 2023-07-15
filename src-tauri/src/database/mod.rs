@@ -1,11 +1,8 @@
 use diesel::{Connection, SqliteConnection};
-use std::future::Future;
-use std::ops::DerefMut;
 use std::sync::Arc;
-use tauri::{AppHandle, Manager, Wry};
-use tokio::sync::{Mutex, MutexGuard};
+use tauri::{AppHandle, Manager};
+use tokio::sync::Mutex;
 
-pub mod insert;
 pub mod models;
 pub mod schema;
 
@@ -14,9 +11,10 @@ pub struct DbConnection {
 }
 
 impl DbConnection {
-    pub async fn setup(app: AppHandle<Wry>) {
+    pub fn setup(app: &AppHandle) {
+        debug!("Connecting to the database!");
         // Connect to the sqlite database
-        // TODO: set location for audio.db
+        // TODO: set location for audio.db, create if doesn't exist
         let conn = SqliteConnection::establish("audio.db")
             .unwrap_or_else(|_| panic!("Error connecting to the db"));
 

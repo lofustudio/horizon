@@ -1,12 +1,13 @@
+mod file;
 pub mod files;
 
-use crate::audio::discover::files::save_tracks;
+use crate::audio::discover::files::save_files;
+use crate::database::DbConnection;
 use tauri::path::BaseDirectory;
 use tauri::{AppHandle, Manager, Wry};
 use tauri_plugin_fs::FsExt;
-use crate::database::DbConnection;
 
-pub fn setup(app: AppHandle<Wry>) {
+pub async fn setup(app: &AppHandle<Wry>) {
     // Allow fs to access system audio directory
     let audio_path = app.path().resolve("Horizon", BaseDirectory::Audio).unwrap();
     if std::fs::read_dir(&audio_path).err().is_some() {
@@ -16,5 +17,5 @@ pub fn setup(app: AppHandle<Wry>) {
 
     // Save list of files to database
     let db = app.state::<DbConnection>();
-    save_tracks(&audio_path, db);
+    save_files(&audio_path, db).await;
 }

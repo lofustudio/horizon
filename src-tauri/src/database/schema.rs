@@ -1,7 +1,7 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
-    library (id) {
+    file (id) {
         id -> Integer,
         path -> Text,
         title -> Text,
@@ -15,11 +15,11 @@ diesel::table! {
 diesel::table! {
     queue (id) {
         id -> Integer,
-        library_id -> Integer,
+        file_id -> Nullable<Integer>,
         play_order -> Integer,
     }
 }
 
-diesel::joinable!(queue -> library (library_id));
+diesel::joinable!(queue -> file (file_id));
 
-diesel::allow_tables_to_appear_in_same_query!(library, queue,);
+diesel::allow_tables_to_appear_in_same_query!(file, queue,);

@@ -7,8 +7,13 @@ pub use mobile::*;
 mod audio;
 mod database;
 
-use crate::audio::discover::files::fetch_tracks;
+use crate::audio::discover::files::fetch_files;
+use crate::database::DbConnection;
 use tauri::App;
+use tokio::spawn;
+
+#[macro_use]
+extern crate log;
 
 //noinspection RsWrongGenericArgumentsNumber
 pub type SetupHook = Box<dyn FnOnce(&mut App) -> Result<(), Box<dyn std::error::Error>> + Send>;
@@ -35,23 +40,27 @@ impl AppBuilder {
 
     #[tokio::main]
     pub async fn run(self) {
+        env_logger::init();
         let setup = self.setup;
         tauri::Builder::default()
             .plugin(tauri_plugin_fs::init())
             .plugin(tauri_plugin_window::init())
             .plugin(tauri_plugin_os::init())
             // Make commands invokable from frontend
-            .invoke_handler(tauri::generate_handler![fetch_tracks])
+            .invoke_handler(tauri::generate_handler![fetch_files])
             .setup(move |app| {
+                debug!("Starting setup!");
+
                 if let Some(setup) = setup {
                     (setup)(app)?;
                 }
 
+                let handle = app.handle();
                 // Set up the database first
-                database::setup(app.handle());
+                DbConnection::setup(&handle);
 
                 // Set up the backend
-                audio::setup(app.handle());
+                spawn(audio::setup(handle));
 
                 Ok(())
             })

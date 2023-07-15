@@ -1,0 +1,6 @@
+CREATE TABLE queue (
+    id INTEGER PRIMARY KEY NOT NULL,
+    file_id INTEGER,
+    play_order INTEGER NOT NULL UNIQUE,
+    FOREIGN KEY (file_id) REFERENCES file(id) ON DELETE CASCADE
+)

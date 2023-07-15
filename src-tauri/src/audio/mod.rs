@@ -1,11 +1,12 @@
-pub(crate) mod discover;
+pub mod discover;
 mod play;
 
-use tauri::{AppHandle, Wry};
+use tauri::AppHandle;
 
-pub fn setup(app: AppHandle<Wry>) {
-    // Setup file discovery
-    discover::setup(app);
+pub async fn setup(app: AppHandle) {
+    // Setup file discovery first
+    discover::setup(&app).await;
 
-    todo!("Thread to play music & next in queue if it is over")
+    // Setup playback
+    play::Playback::setup(&app).await;
 }

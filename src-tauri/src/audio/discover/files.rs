@@ -1,42 +1,38 @@
 use crate::database::DbConnection;
-use diesel::{insert_into, QueryDsl, RunQueryDsl, SelectableHelper, SqliteConnection};
+use diesel::{QueryDsl, RunQueryDsl, SelectableHelper};
 use serde_json::{json, Value};
-use std::ops::DerefMut;
+use std::ops::{Deref, DerefMut};
 use std::path::Path;
-use std::sync::{Arc, Mutex};
 use tauri::{command, State};
 use walkdir::WalkDir;
 
-pub async fn save_tracks(path: &Path, db: State<'_, DbConnection>) {
-    use crate::database::models::NewLibrary;
-    use crate::database::schema::library;
+/// Crawls the given directory to find files and saves detected files into the database.
+pub async fn save_files(path: &Path, db: State<'_, DbConnection>) {
+    use crate::database::models::NewFile;
 
     for file in WalkDir::new(path).into_iter().filter_map(|file| file.ok()) {
         if file.metadata().unwrap().is_file() {
-            println!("Found file: {:?}", file.path());
-            let new_library = NewLibrary::new(file.into_path());
-
-            // TODO: this assumes the music is not already in the library
-            let mut conn = db.db.lock().await;
-            insert_into(library::table)
-                .values(new_library)
-                .execute(conn.deref_mut())
-                .expect("Could not insert into library");
+            // TODO: is the file a music file or something else?
+            debug!("Found file: {:?}", file.path());
+            NewFile::insert(&file.into_path(), db.deref()).await;
         }
     }
 }
 
 #[command]
-pub async fn fetch_tracks(db: State<'_, DbConnection>) -> Result<Vec<Value>, ()> {
-    use crate::database::models::Library;
-    use crate::database::schema::library::dsl::library;
+/// Tauri command to return everything in the file table as an array of json.
+pub async fn fetch_files(db: State<'_, DbConnection>) -> Result<Vec<Value>, ()> {
+    use crate::database::models::File;
+    use crate::database::schema::file::dsl::file;
 
     // Fetch library entries from database
     let mut conn = db.db.lock().await;
-    let lib = library
-        .select(Library::as_select())
+    let lib = file
+        .select(File::as_select())
         .load(conn.deref_mut())
         .expect("Failed to select from database");
+
+    // Return as an array of json
     let test = lib.iter().map(|x| json!(x)).collect();
     Ok(test)
 }

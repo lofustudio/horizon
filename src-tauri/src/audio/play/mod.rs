@@ -1,77 +1,117 @@
-use diesel::{delete, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper, SqliteConnection};
-use rodio::queue::{queue, SourcesQueueOutput};
-use rodio::{Device, OutputStream, Sample, Sink, Source};
-use std::ops::{Deref, DerefMut};
-use std::sync::{Arc, Mutex};
-use tauri::{AppHandle, Manager, Wry};
-use tokio::sync::mpsc::Receiver;
-use tokio::sync::RwLock;
+mod file;
+mod queue;
+
 use crate::database::DbConnection;
-use crate::database::schema::queue;
+use futures::executor::block_on;
+use rodio::cpal::traits::HostTrait;
+use rodio::{cpal, Device, OutputStream, Sink};
+use std::ops::Deref;
+use std::sync::Arc;
+use tauri::{AppHandle, Manager, Wry};
+use tokio::spawn;
+use tokio::sync::mpsc::{channel, Receiver, Sender};
+use tokio::sync::RwLock;
+use tokio::task::spawn_blocking;
 
 pub struct Playback {
     sink: Arc<RwLock<Sink>>,
+    playing: RwLock<bool>,
+    play: Sender<()>,
 }
 
-pub fn setup(app: AppHandle<Wry>) {
-    todo!("Playback setup")
-}
+impl Playback {
+    /// This function will set up the Playback state.
+    pub async fn setup(app: &AppHandle<Wry>) {
+        debug!("Setting up the playback!");
 
-/// Spawning this function will set up a receiver for changing output device.
-async fn device(app: AppHandle<Wry>, mut rx: Receiver<Device>) {
-    // Mutable stream to prevent drop
-    let mut stream = OutputStream::try_default().expect("No output devices found");
+        let clone = app.clone();
+        let (device_tx, device_rx) = channel::<Device>(10);
 
-    while let Some(device) = rx.recv().await {
-        // TODO: move the current playing source to the new device
-        // Create stream and sink from provided device
-        stream = OutputStream::try_from_device(&device).expect("Failed to create device stream");
-        let sink = Sink::try_new(&stream.1).expect("Failed to use stream");
+        spawn_blocking(|| Playback::device(clone, device_rx));
 
-        // If sink is managed, edit; create if not
-        let state = app.try_state::<Playback>();
-        if let Some(state) = state {
-            *state.sink.write().await = sink;
-        } else {
-            app.manage(RwLock::new(sink));
-        }
+        let host = cpal::default_host();
+        let default = host
+            .default_output_device()
+            .expect("No output device available");
+        device_tx
+            .send(default)
+            .await
+            .expect("Failed to send Device");
     }
-}
 
-/// Spawning this will play the queued music.
-async fn play(app: AppHandle<Wry>) {
-    use crate::database::models::Queue;
-    use crate::database::schema::queue::dsl;
+    /// Spawning this blocking function will add Playback to states and set up a receiver for changing the output device.
+    fn device(app: AppHandle<Wry>, mut device_rx: Receiver<Device>) {
+        debug!("Setting up device changing!");
 
-    let playing: i32 = 0;
+        // Mutable stream to prevent drop
+        #[allow(unused_assignments)]
+        let mut stream = OutputStream::try_default().expect("No output devices found");
 
-    loop {
-        let db_state = app.state::<DbConnection>();
-        let mut conn = db_state.db.lock().await;
+        while let Some(device) = block_on(device_rx.recv()) {
+            // TODO: move the current playing source to the new device
+            // Create stream and sink from provided device
+            stream =
+                OutputStream::try_from_device(&device).expect("Failed to create device stream");
+            let sink = Sink::try_new(&stream.1).expect("Failed to use stream");
 
-        let sink_state = app.state::<Playback>();
-        let sink = sink_state.sink.read().await;
-
-        let result = dsl::queue
-            .select(Queue::as_select())
-            .order(dsl::play_order)
-            .limit(1)
-            .first(conn.deref_mut())
-            .optional()
-            .expect("Failed to select from database");
-
-        match result {
-            Some(data) => {
-                // TODO: implement play to Queue and Library
-            },
-            None => {
-                // TODO: No more queued songs.
-                // Clear the queue.
-                delete(queue::table)
-                    .execute(conn.deref_mut())
-                    .expect("Failed to clear queue");
+            let state = app.try_state::<Playback>();
+            if let Some(state) = state {
+                // Playback is already managed, edit
+                *block_on(state.sink.write()) = sink;
+            } else {
+                // Create a new Playback, manage
+                let (play_tx, play_rx) = channel(1);
+                app.manage(Playback {
+                    sink: Arc::new(RwLock::new(sink)),
+                    playing: RwLock::new(false),
+                    play: play_tx,
+                });
+                spawn(Playback::player(app.clone(), play_rx));
             }
         }
-        todo!("read nth entry from queue database. if it exists, play, and sleep until it ends, while also being able to seek or skip.");
+    }
+
+    /// Spawning this will play the queued music.
+    async fn player(app: AppHandle<Wry>, mut play: Receiver<()>) {
+        debug!("Starting the player!");
+        use crate::database::models::Queue;
+
+        let mut playing: i32 = 0;
+
+        loop {
+            let db_state = app.state::<DbConnection>();
+
+            // Select first entry with play_order equal to playing.
+            let result = Queue::next(db_state.deref(), &playing).await;
+
+            match result {
+                Some(data) => {
+                    // TODO: implement seeking/stopping, emit event
+                    let sink_state = app.state::<Playback>();
+
+                    playing = data.play_order + 1;
+                    *sink_state.playing.write().await = true;
+
+                    // Await until the song has finished playing.
+                    data.play(db_state.deref(), sink_state.deref()).await;
+                }
+                None => {
+                    // TODO: emit event
+                    // Clear the queue.
+                    Queue::clear(db_state.deref()).await;
+
+                    let sink_state = app.state::<Playback>();
+
+                    playing = 0;
+                    *sink_state.playing.write().await = false;
+
+                    // Wait for a message before looking for the next queued song.
+                    play.recv().await;
+                }
+            }
+        }
     }
 }
+
+// TODO: get File id from frontend, add to Queue
+// TODO: get all Queue and return to frontend
