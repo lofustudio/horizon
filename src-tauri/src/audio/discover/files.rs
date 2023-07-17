@@ -9,6 +9,7 @@ use walkdir::WalkDir;
 /// Crawls the given directory to find files and saves detected files into the database.
 pub async fn save_files(path: &Path, db: State<'_, DbConnection>) {
     use crate::database::models::NewFile;
+    debug!("Saving files in {} to the database", path.to_str().unwrap());
 
     for file in WalkDir::new(path).into_iter().filter_map(|file| file.ok()) {
         if file.metadata().unwrap().is_file() {
@@ -24,6 +25,7 @@ pub async fn save_files(path: &Path, db: State<'_, DbConnection>) {
 pub async fn fetch_files(db: State<'_, DbConnection>) -> Result<Vec<Value>, ()> {
     use crate::database::models::File;
     use crate::database::schema::file::dsl::file;
+    debug!("fetch_files invoked");
 
     // Fetch library entries from database
     let mut conn = db.db.lock().await;

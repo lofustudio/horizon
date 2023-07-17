@@ -1,5 +1,6 @@
 mod file;
 mod queue;
+pub mod command;
 
 use crate::database::DbConnection;
 use futures::executor::block_on;
@@ -14,9 +15,9 @@ use tokio::sync::RwLock;
 use tokio::task::spawn_blocking;
 
 pub struct Playback {
-    sink: Arc<RwLock<Sink>>,
-    playing: RwLock<bool>,
-    play: Sender<()>,
+    pub sink: Arc<RwLock<Sink>>,
+    pub playing: RwLock<bool>,
+    pub play: Sender<()>,
 }
 
 impl Playback {
@@ -86,9 +87,11 @@ impl Playback {
 
             match result {
                 Some(data) => {
-                    // TODO: implement seeking/stopping, emit event
-                    let sink_state = app.state::<Playback>();
+                    debug!("Playing queued song {}", data.play_order);
+                    app.emit_all("playing", data.play_order).expect("Failed to emit event");
+                    // TODO: implement seeking/stopping
 
+                    let sink_state = app.state::<Playback>();
                     playing = data.play_order + 1;
                     *sink_state.playing.write().await = true;
 
@@ -96,7 +99,9 @@ impl Playback {
                     data.play(db_state.deref(), sink_state.deref()).await;
                 }
                 None => {
-                    // TODO: emit event
+                    debug!("The queue is empty.");
+                    app.emit_all("stopped", ()).expect("Failed to emit event");
+
                     // Clear the queue.
                     Queue::clear(db_state.deref()).await;
 
@@ -112,6 +117,3 @@ impl Playback {
         }
     }
 }
-
-// TODO: get File id from frontend, add to Queue
-// TODO: get all Queue and return to frontend

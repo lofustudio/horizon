@@ -10,6 +10,7 @@ impl NewFile {
     /// Create and insert NewFile into the database.
     pub async fn insert(path: &PathBuf, db: &DbConnection) {
         use crate::database::schema::file;
+        debug!("Inserting {} to the database", path.to_str().unwrap());
 
         // TODO: this assumes the file is not already in the library
         let mut conn = db.db.lock().await;

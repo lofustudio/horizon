@@ -5,6 +5,7 @@ use diesel::{
     delete, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper,
 };
 use std::ops::DerefMut;
+use crate::database::schema::queue::play_order;
 
 impl Queue {
     /// Gets the next entry from the Queue (play_order >= playing)
@@ -16,6 +17,7 @@ impl Queue {
         dsl::queue
             .select(Queue::as_select())
             .filter(dsl::play_order.ge(playing))
+            .order_by(play_order.asc())
             .first(conn.deref_mut())
             .optional()
             .expect("Failed to select from database")

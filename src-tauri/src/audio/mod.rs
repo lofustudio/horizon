@@ -1,5 +1,5 @@
 pub mod discover;
-mod play;
+pub mod play;
 
 use tauri::AppHandle;
 

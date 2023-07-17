@@ -25,7 +25,7 @@ pub struct NewFile {
     pub duration: Option<i32>,
 }
 
-#[derive(Queryable, Selectable, Identifiable, Associations)]
+#[derive(Queryable, Selectable, Identifiable, Associations, Serialize)]
 #[diesel(belongs_to(File))]
 #[diesel(table_name = crate::database::schema::queue)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]

@@ -8,6 +8,7 @@ mod audio;
 mod database;
 
 use crate::audio::discover::files::fetch_files;
+use crate::audio::play::command::{fetch_queue, add_file_to_queue};
 use crate::database::DbConnection;
 use tauri::App;
 use tokio::spawn;
@@ -47,7 +48,7 @@ impl AppBuilder {
             .plugin(tauri_plugin_window::init())
             .plugin(tauri_plugin_os::init())
             // Make commands invokable from frontend
-            .invoke_handler(tauri::generate_handler![fetch_files])
+            .invoke_handler(tauri::generate_handler![fetch_files, fetch_queue, add_file_to_queue])
             .setup(move |app| {
                 debug!("Starting setup!");
 
