@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@solidjs/router": "^0.8.2",
-    "@tauri-apps/api": "2.0.0-alpha.5",
+    "@tauri-apps/api": "^2.0.0-alpha.5",
     "@tauri-apps/plugin-fs": "https://github.com/tauri-apps/tauri-plugin-fs#v2",
     "@tauri-apps/plugin-os": "https://github.com/tauri-apps/tauri-plugin-os#v2",
     "@tauri-apps/plugin-store": "https://github.com/tauri-apps/tauri-plugin-store#v2",
