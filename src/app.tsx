@@ -1,12 +1,13 @@
 import { type Component, createEffect, createSignal, Show } from 'solid-js';
 import { Route, Routes } from '@solidjs/router';
 import { platform } from '@tauri-apps/plugin-os';
-import WindowBar from './components/window/bar';
 
+import WindowBar from './components/window/bar';
 import IndexPage from './pages/index';
+
 import ThemeContextProvider from './context/theme';
-import SettingsContextProvider, { useSettings } from './context/settings';
-import SetupPage from './pages/setup';
+import SettingsContextProvider from './context/settings';
+import AudioContextProvider from './context/audio';
 
 const App: Component = () => {
   const [mobile, setMobile] = createSignal(false);
@@ -34,9 +35,11 @@ const App: Component = () => {
           <WindowBar />
         </nav>
         <SettingsContextProvider>
-          <Routes>
-            <Route path='/' element={<IndexPage />} />
-          </Routes>
+          <AudioContextProvider>
+            <Routes>
+              <Route path='/' element={<IndexPage />} />
+            </Routes>
+          </AudioContextProvider>
         </SettingsContextProvider >
       </main>
     </ThemeContextProvider>

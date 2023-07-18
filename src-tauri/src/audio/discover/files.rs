@@ -1,5 +1,6 @@
 use crate::database::DbConnection;
-use diesel::{QueryDsl, RunQueryDsl, SelectableHelper};
+use diesel::{delete, QueryDsl, RunQueryDsl, SelectableHelper};
+use log::debug;
 use serde_json::{json, Value};
 use std::ops::{Deref, DerefMut};
 use std::path::Path;
@@ -18,6 +19,16 @@ pub async fn save_files(path: &Path, db: State<'_, DbConnection>) {
             NewFile::insert(&file.into_path(), db.deref()).await;
         }
     }
+}
+
+// Clear the file table
+pub async fn clear(db: &DbConnection) {
+    use crate::database::schema::file::table;
+    let mut conn = db.db.lock().await;
+
+    delete(table)
+        .execute(conn.deref_mut())
+        .expect("Failed to clear files");
 }
 
 #[command]

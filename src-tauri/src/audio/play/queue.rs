@@ -1,11 +1,12 @@
 use crate::audio::play::Playback;
 use crate::database::models::{File, Queue};
+use crate::database::schema::queue::play_order;
 use crate::database::DbConnection;
 use diesel::{
     delete, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper,
 };
+use log::debug;
 use std::ops::DerefMut;
-use crate::database::schema::queue::play_order;
 
 impl Queue {
     /// Gets the next entry from the Queue (play_order >= playing)

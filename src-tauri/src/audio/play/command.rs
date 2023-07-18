@@ -1,16 +1,23 @@
-use std::ops::DerefMut;
-use diesel::{ExpressionMethods, insert_into, QueryDsl, RunQueryDsl, SelectableHelper};
-use serde_json::{json, Value};
-use tauri::{command, State};
 use crate::audio::play::Playback;
-use crate::database::DbConnection;
 use crate::database::models::{NewQueue, Queue};
 use crate::database::schema::queue;
 use crate::database::schema::queue::{dsl, play_order};
+use crate::database::DbConnection;
+use diesel::{
+    insert_into, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl, SelectableHelper,
+};
+use log::debug;
+use serde_json::{json, Value};
+use std::ops::DerefMut;
+use tauri::{command, State};
 
 #[command]
 /// Tauri command to add a File to the Queue
-pub async fn add_file_to_queue(db: State<'_, DbConnection>, playback: State<'_, Playback>, file: i32) -> Result<(), ()> {
+pub async fn add_file_to_queue(
+    db: State<'_, DbConnection>,
+    playback: State<'_, Playback>,
+    file: i32,
+) -> Result<(), ()> {
     debug!("add_file_to_queue invoked");
     let mut conn = db.db.lock().await;
 
@@ -20,15 +27,36 @@ pub async fn add_file_to_queue(db: State<'_, DbConnection>, playback: State<'_, 
         .order_by(play_order.desc())
         .limit(1)
         .first::<i32>(conn.deref_mut())
+        .optional()
         .expect("Failed to select play_order");
 
-    insert_into(queue::table)
-        .values(NewQueue { file_id: Some(file), play_order: playorder + 1} )
-        .execute(conn.deref_mut())
-        .expect("Failed to insert to Queue");
+    match playorder {
+        Some(playorder) => {
+            insert_into(queue::table)
+                .values(NewQueue {
+                    file_id: Some(file),
+                    play_order: playorder + 1,
+                })
+                .execute(conn.deref_mut())
+                .expect("Failed to insert to Queue");
+        }
+        None => {
+            insert_into(queue::table)
+                .values(NewQueue {
+                    file_id: Some(file),
+                    play_order: 0,
+                })
+                .execute(conn.deref_mut())
+                .expect("Failed to insert to Queue");
+        }
+    }
 
     if !(*playback.playing.read().await) {
-        playback.play.send(()).await.expect("Failed to continue playing");
+        playback
+            .play
+            .send(())
+            .await
+            .expect("Failed to continue playing");
     }
 
     Ok(())

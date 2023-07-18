@@ -2,6 +2,7 @@ use crate::database::models::NewFile;
 use crate::database::DbConnection;
 use diesel::{insert_into, RunQueryDsl};
 use lofty::{read_from_path, Accessor, AudioFile, TaggedFileExt};
+use log::debug;
 use std::ffi::OsStr;
 use std::ops::DerefMut;
 use std::path::PathBuf;

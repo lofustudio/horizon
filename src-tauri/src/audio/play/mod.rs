@@ -1,9 +1,10 @@
+pub mod command;
 mod file;
 mod queue;
-pub mod command;
 
 use crate::database::DbConnection;
 use futures::executor::block_on;
+use log::debug;
 use rodio::cpal::traits::HostTrait;
 use rodio::{cpal, Device, OutputStream, Sink};
 use std::ops::Deref;
@@ -88,7 +89,8 @@ impl Playback {
             match result {
                 Some(data) => {
                     debug!("Playing queued song {}", data.play_order);
-                    app.emit_all("playing", data.play_order).expect("Failed to emit event");
+                    app.emit_all("playing", data.play_order)
+                        .expect("Failed to emit event");
                     // TODO: implement seeking/stopping
 
                     let sink_state = app.state::<Playback>();

@@ -1,4 +1,5 @@
 use diesel::{Connection, SqliteConnection};
+use log::debug;
 use std::sync::Arc;
 use tauri::{AppHandle, Manager};
 use tokio::sync::Mutex;

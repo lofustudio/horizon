@@ -1,6 +1,7 @@
 #[cfg(mobile)]
 mod mobile;
 
+use log::debug;
 #[cfg(mobile)]
 pub use mobile::*;
 
@@ -8,13 +9,10 @@ mod audio;
 mod database;
 
 use crate::audio::discover::files::fetch_files;
-use crate::audio::play::command::{fetch_queue, add_file_to_queue};
+use crate::audio::play::command::{add_file_to_queue, fetch_queue};
 use crate::database::DbConnection;
 use tauri::App;
 use tokio::spawn;
-
-#[macro_use]
-extern crate log;
 
 //noinspection RsWrongGenericArgumentsNumber
 pub type SetupHook = Box<dyn FnOnce(&mut App) -> Result<(), Box<dyn std::error::Error>> + Send>;
@@ -47,8 +45,13 @@ impl AppBuilder {
             .plugin(tauri_plugin_fs::init())
             .plugin(tauri_plugin_window::init())
             .plugin(tauri_plugin_os::init())
+            .plugin(tauri_plugin_store::Builder::default().build())
             // Make commands invokable from frontend
-            .invoke_handler(tauri::generate_handler![fetch_files, fetch_queue, add_file_to_queue])
+            .invoke_handler(tauri::generate_handler![
+                fetch_files,
+                fetch_queue,
+                add_file_to_queue
+            ])
             .setup(move |app| {
                 debug!("Starting setup!");
 
