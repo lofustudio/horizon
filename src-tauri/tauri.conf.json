@@ -1,0 +1,55 @@
+{
+  "build": {
+    "beforeDevCommand": "pnpm dev",
+    "beforeBuildCommand": "pnpm build",
+    "devPath": "http://localhost:1420",
+    "distDir": "../dist"
+  },
+  "package": {
+    "productName": "Horizon",
+    "version": "0.0.1"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": false,
+      "shell": {
+        "all": false,
+        "open": true
+      }
+    },
+    "bundle": {
+      "active": true,
+      "targets": "all",
+      "identifier": "studio.lofu.horizon",
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.icns",
+        "icons/icon.ico"
+      ]
+    },
+    "security": {
+      "csp": {
+        "default-src": "'none'",
+        "style-src": "'self' 'unsafe-inline'",
+        "img-src": "'self' data: https:",
+        "media-src": "https:",
+        "font-src": "'self'",
+        "connect-src": "https: wss:"
+      }
+    },
+    "windows": [
+      {
+        "title": "Horizon",
+        "width": 1280,
+        "height": 720,
+        "minWidth": 950,
+        "minHeight": 500,
+        "fullscreen": false,
+        "center": true,
+        "resizable": true
+      }
+    ]
+  }
+}
