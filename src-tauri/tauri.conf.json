@@ -7,7 +7,7 @@
   },
   "package": {
     "productName": "Horizon",
-    "version": "0.0.1"
+    "version": "0.0.0"
   },
   "tauri": {
     "allowlist": {
@@ -15,6 +15,9 @@
       "shell": {
         "all": false,
         "open": true
+      },
+      "window": {
+        "all": true
       }
     },
     "bundle": {
@@ -48,7 +51,9 @@
         "minHeight": 500,
         "fullscreen": false,
         "center": true,
-        "resizable": true
+        "resizable": true,
+        "decorations": false,
+        "transparent": true
       }
     ]
   }
