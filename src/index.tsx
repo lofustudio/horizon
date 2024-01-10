@@ -8,15 +8,23 @@ import {
   RootRoute,
   Route,
 } from '@tanstack/react-router';
-import Index from "./routes";
+
+// Contexts
 import { ThemeProvider } from "./context/theme";
+
+// Components
+import WindowBar from "./components/app/window-bar";
+
+// Routes
+import YourLibraryPage from "./routes/library";
+import LibraryBar from "./components/app/library-bar";
 
 const rootRoute = new RootRoute();
 
 const indexRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "/",
-  component: Index,
+  component: YourLibraryPage,
 });
 
 const routeTree = rootRoute.addChildren([indexRoute])
@@ -36,7 +44,15 @@ if (!rootElement.innerHTML) {
   root.render(
     <React.StrictMode>
       <ThemeProvider defaultTheme="dark" storageKey="theme">
-        <RouterProvider router={router} />
+        <main className="flex flex-col w-full min-h-screen">
+          <nav id='nav' className='fixed z-[2000] top-0 w-full h-[36px]'>
+            <WindowBar />
+          </nav>
+          <div className="flex flex-row w-full">
+            <LibraryBar />
+            <RouterProvider router={router} />
+          </div>
+        </main>
       </ThemeProvider>
     </React.StrictMode>,
   )
