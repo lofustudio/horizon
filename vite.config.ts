@@ -1,29 +1,27 @@
-import path from 'path'
-import { defineConfig } from 'vite'
-import solidPlugin from 'vite-plugin-solid'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
 
-export default defineConfig({
-  clearScreen: false,
-  server: {
-    host: '0.0.0.0', // listen on all addresses
-    port: 3000,
-    strictPort: true,
-    hmr: {
-      protocol: 'ws',
-      host: '192.168.1.120',
-      port: 3000,
-    },
-  },
-  envPrefix: ['VITE_', 'TAURI_'],
-  build: {
-    target: process.env.TAURI_PLATFORM == 'windows' ? 'chrome105' : 'safari13',
-    minify: !process.env.TAURI_DEBUG ? 'esbuild' : false,
-    sourcemap: !!process.env.TAURI_DEBUG,
-  },
-  plugins: [solidPlugin()],
+// https://vitejs.dev/config/
+export default defineConfig(async () => ({
+  plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      "@": path.resolve(__dirname, "./src"),
     }
-  }
-})
+  },
+
+  // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
+  //
+  // 1. prevent vite from obscuring rust errors
+  clearScreen: false,
+  // 2. tauri expects a fixed port, fail if that port is not available
+  server: {
+    port: 1420,
+    strictPort: true,
+    watch: {
+      // 3. tell vite to ignore watching `src-tauri`
+      ignored: ["**/src-tauri/**"],
+    },
+  },
+}));

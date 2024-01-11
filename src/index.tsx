@@ -1,20 +1,59 @@
-/* @refresh reload */
-import { render } from 'solid-js/web';
-import { Router } from '@solidjs/router';
+import "./index.css";
 
-import './index.css';
-import App from './app';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import {
+  RouterProvider,
+  Router,
+  RootRoute,
+  Route,
+} from '@tanstack/react-router';
 
-const root = document.getElementById('root');
+// Contexts
+import { ThemeProvider } from "./context/theme";
 
-if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
-  throw new Error(
-    'Root element not found. Did you forget to add it to your index.html? Or maybe the id attribute got misspelled?',
-  );
+// Components
+import WindowBar from "./components/app/window-bar";
+
+// Routes
+import YourLibraryPage from "./routes/library";
+import LibraryBar from "./components/app/library-bar";
+
+const rootRoute = new RootRoute();
+
+const indexRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "/",
+  component: YourLibraryPage,
+});
+
+const routeTree = rootRoute.addChildren([indexRoute])
+
+const router = new Router({ routeTree })
+
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router
+  }
 }
 
-render(() => (
-  <Router>
-    <App />
-  </Router>
-), root!)
+const rootElement = document.getElementById('root') as HTMLElement;
+
+if (!rootElement.innerHTML) {
+  const root = ReactDOM.createRoot(rootElement)
+  root.render(
+    <React.StrictMode>
+      <ThemeProvider defaultTheme="dark" storageKey="theme">
+        <main className="flex flex-col w-full min-h-screen">
+          <nav id='nav' className='fixed z-[2000] top-0 w-full h-[36px]'>
+            <WindowBar />
+          </nav>
+          <div className="flex flex-row w-full">
+            <LibraryBar />
+            <RouterProvider router={router} />
+          </div>
+        </main>
+      </ThemeProvider>
+    </React.StrictMode>,
+  )
+}
