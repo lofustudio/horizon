@@ -11,7 +11,7 @@ pub fn read_from_consumer<T: Clone + Copy>(
     use rtrb::chunks::ChunkError::TooFewSlots;
     let chunk = match buf_r.read_chunk(buf.len()) {
         Ok(chunk) => chunk,
-        Err(TooFewSlots(0)) => return Err(anyhow!("audio output buffer underrun")),
+        Err(TooFewSlots(0)) => return Err(anyhow!("output buffer underrun")),
         Err(TooFewSlots(n)) => buf_r.read_chunk(n).unwrap(),
     };
     let (first, second) = chunk.as_slices();

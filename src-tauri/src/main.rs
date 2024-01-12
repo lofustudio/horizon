@@ -13,7 +13,10 @@ mod commands;
 #[tokio::main]
 async fn main() {
     // Initialize logger
-    pretty_env_logger::init();
+    let mut builder = pretty_env_logger::formatted_builder();
+    builder.filter_level(log::LevelFilter::Trace);
+    builder.parse_env("RUST_LOG");
+    builder.init();
 
     // Start Tauri application
     tauri::Builder::default()
@@ -25,19 +28,20 @@ async fn main() {
 
             let sample_rate = output.config.sample_rate.0 as f32;
 
-            // Produce a sinusoid of maximum amplitude.
+            // Produce a sinusoid of 128 Hz.
             let mut sample_clock = 0f32;
             let mut next_value = move || {
                 sample_clock = (sample_clock + 1.0) % sample_rate;
-                (sample_clock * 440.0 * 2.0 * std::f32::consts::PI / sample_rate).sin()
+                (sample_clock * 128.0 * 2.0 * std::f32::consts::PI / sample_rate).sin()
             };
 
             loop {
-                let _ = output.buf_w.push(next_value());
-                std::thread::sleep(std::time::Duration::from_millis(5));
+                if output.buf_w.push(next_value()).is_err() {
+                    std::thread::sleep(std::time::Duration::from_millis(5));
+                }
             }
 
-            // Allow unreachable code (for now)
+            // Allow unreachable code for now
             #[allow(unreachable_code)]
             Ok(())
         })
