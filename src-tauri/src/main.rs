@@ -5,8 +5,9 @@ extern crate pretty_env_logger;
 #[macro_use]
 extern crate log;
 
-use tauri::Manager as _;
+use audio::output::AudioOutput;
 
+mod audio;
 mod commands;
 
 #[tokio::main]
@@ -17,7 +18,29 @@ async fn main() {
     // Start Tauri application
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![commands::utils::check_app_dir])
-        .setup(|app| Ok(()))
+        .setup(|_app| {
+            // This is test code for the audio output!
+            // TODO: Remove this when we have a real audio engine
+            let mut output = AudioOutput::try_new().unwrap();
+
+            let sample_rate = output.config.sample_rate.0 as f32;
+
+            // Produce a sinusoid of maximum amplitude.
+            let mut sample_clock = 0f32;
+            let mut next_value = move || {
+                sample_clock = (sample_clock + 1.0) % sample_rate;
+                (sample_clock * 440.0 * 2.0 * std::f32::consts::PI / sample_rate).sin()
+            };
+
+            loop {
+                let _ = output.buf_w.push(next_value());
+                std::thread::sleep(std::time::Duration::from_millis(5));
+            }
+
+            // Allow unreachable code (for now)
+            #[allow(unreachable_code)]
+            Ok(())
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
