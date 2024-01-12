@@ -7,6 +7,8 @@ extern crate log;
 
 use tauri::Manager as _;
 
+mod commands;
+
 #[tokio::main]
 async fn main() {
     // Initialize logger
@@ -14,7 +16,7 @@ async fn main() {
 
     // Start Tauri application
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![])
+        .invoke_handler(tauri::generate_handler![commands::utils::check_app_dir])
         .setup(|app| Ok(()))
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
