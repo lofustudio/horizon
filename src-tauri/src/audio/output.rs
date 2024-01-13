@@ -1,11 +1,12 @@
 use anyhow::anyhow;
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use rtrb::{Producer, RingBuffer};
+use std::{thread, time::Duration};
+use tokio::task::spawn_blocking;
 
 pub struct AudioOutput {
     pub buf_w: Producer<f32>,
     pub config: cpal::StreamConfig,
-    pub stream: cpal::Stream,
 }
 
 impl AudioOutput {
@@ -40,31 +41,40 @@ impl AudioOutput {
         let buf_size = ((50 * config.sample_rate().0 as usize) / 1000) * config.channels() as usize;
         let (buf_w, mut buf_r) = RingBuffer::<f32>::new(buf_size);
 
-        let stream_result = device.build_output_stream(
-            &config.config(),
-            move |buf: &mut [f32], _: &cpal::OutputCallbackInfo| {
-                match super::utils::read_from_consumer(&mut buf_r, buf) {
-                    Ok(write_len) => buf[write_len..].fill(0.0),
-                    Err(err) => warn!("{}", err),
-                }
-            },
-            move |err| warn!("audio output error: {}", err),
-            None,
-        );
+        let moved_config = config.clone();
+        spawn_blocking(move || {
+            let stream_result = device.build_output_stream(
+                &moved_config.config(),
+                move |buf: &mut [f32], _: &cpal::OutputCallbackInfo| {
+                    match super::utils::read_from_consumer(&mut buf_r, buf) {
+                        Ok(write_len) => buf[write_len..].fill(0.0),
+                        Err(_) => {
+                            // TODO
+                        }
+                    }
+                },
+                move |err| warn!("audio output error: {}", err),
+                None,
+            );
 
-        let stream = match stream_result {
-            Ok(stream) => stream,
-            Err(err) => return Err(anyhow!(err)),
-        };
+            let stream = match stream_result {
+                Ok(stream) => stream,
+                Err(err) => return Err(anyhow!(err)),
+            };
 
-        if let Err(err) = stream.play() {
-            return Err(anyhow!(err));
-        }
+            if let Err(err) = stream.play() {
+                return Err(anyhow!(err));
+            }
+
+            // TODO: this is a hack to keep the audio output stream alive
+            thread::sleep(Duration::from_secs(999));
+
+            Ok(())
+        });
 
         Ok(Self {
             buf_w,
             config: config.config(),
-            stream,
         })
     }
 }
